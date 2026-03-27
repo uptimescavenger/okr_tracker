@@ -18,6 +18,9 @@ st.set_page_config(
     layout="wide",
 )
 
+# ── Inject custom styling ──
+ui.inject_css()
+
 # ── Check secrets are configured ──
 if config.SPREADSHEET_ID == "YOUR_SPREADSHEET_ID_HERE":
     st.error(
@@ -34,8 +37,10 @@ if "gcp_service_account" not in st.secrets:
     )
     st.stop()
 
-# ── Sidebar → quarter selection ──
-quarter = ui.render_sidebar()
+# ── Sidebar (quarter selection + Add OKR form) ──
+quarter_ref = []
+ui.render_sidebar(quarter_ref)
+quarter = quarter_ref[0]
 
 # ── Load data ──
 okrs_df = sheets.read_okrs(quarter)
@@ -43,16 +48,18 @@ kpis_df = sheets.read_kpis(quarter)
 history_df = sheets.read_kpi_history(quarter)
 notes_df = sheets.read_notes()
 
-# ── OKR section ──
-st.header(f"Objectives — {quarter}")
+# ── Header ──
+st.markdown(
+    f"<h2 style='margin-bottom:0;'>{quarter}</h2>",
+    unsafe_allow_html=True,
+)
+st.caption("Click an objective tab below to view its key results and progress.")
+
+# ── Summary metrics ──
 stats = data.okr_summary_stats(okrs_df, kpis_df)
 ui.render_okr_metrics(stats)
 
-if okrs_df.empty:
-    st.info("No OKRs for this quarter yet. Add one below.")
-else:
-    for _, row in okrs_df.iterrows():
-        ui.render_okr_card(row, kpis_df, history_df, notes_df, quarter)
+st.markdown("<br>", unsafe_allow_html=True)
 
-# ── Add new OKR ──
-ui.render_add_okr_form(quarter)
+# ── OKR tabs ──
+ui.render_okr_tabs(okrs_df, kpis_df, history_df, notes_df, quarter)

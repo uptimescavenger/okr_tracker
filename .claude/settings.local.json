@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls \"/Users/jineshpatel/OKR Tracker/\"*.json)"
+      "Bash(ls \"/Users/jineshpatel/OKR Tracker/\"*.json)",
+      "Bash(source venv/bin/activate)",
+      "Bash(python3 -c \":*)"
     ]
   }
 }
