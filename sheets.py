@@ -205,3 +205,37 @@ def add_kpi(quarter: str, row: list):
     )
     ws.append_row(row, value_input_option="USER_ENTERED")
     _clear_cache()
+
+
+def update_okr_fields(quarter: str, okr_id: str, fields: dict):
+    """Update arbitrary fields on an OKR row by column name.
+
+    ``fields`` is a dict like {"title": "New title", "owner": "Alice"}.
+    """
+    ws = _get_or_create_worksheet(
+        config.okr_tab_name(quarter), config.OKR_COLUMNS
+    )
+    cell = ws.find(str(okr_id), in_column=1)
+    if cell is None:
+        raise ValueError(f"OKR id '{okr_id}' not found")
+    for col_name, value in fields.items():
+        col_idx = config.OKR_COLUMNS.index(col_name) + 1
+        ws.update_cell(cell.row, col_idx, value)
+    _clear_cache()
+
+
+def update_kpi_fields(quarter: str, kpi_id: str, fields: dict):
+    """Update arbitrary fields on a KPI/Key Result row by column name.
+
+    ``fields`` is a dict like {"name": "New KR name", "owner": "Bob"}.
+    """
+    ws = _get_or_create_worksheet(
+        config.kpi_tab_name(quarter), config.KPI_COLUMNS
+    )
+    cell = ws.find(str(kpi_id), in_column=1)
+    if cell is None:
+        raise ValueError(f"Key Result id '{kpi_id}' not found")
+    for col_name, value in fields.items():
+        col_idx = config.KPI_COLUMNS.index(col_name) + 1
+        ws.update_cell(cell.row, col_idx, value)
+    _clear_cache()

@@ -17,7 +17,7 @@ import data
 BR = "10px"
 
 # ──────────────────────────────────────────────
-#  Custom CSS — responsive, uniform radii
+#  Custom CSS — responsive, uniform radii, no purple bar
 # ──────────────────────────────────────────────
 
 def inject_css():
@@ -81,11 +81,10 @@ def inject_css():
         color: #1e293b !important;
     }}
 
-    /* ── Progress bars ── */
+    /* ── Progress bars — clean, NO gradient bar above ── */
     [data-testid="stProgress"] > div > div {{
         border-radius: {BR};
         height: 8px !important;
-        background: linear-gradient(90deg, #6366f1, #a855f7) !important;
     }}
     [data-testid="stProgress"] > div {{
         background-color: #e8e0f0 !important;
@@ -190,6 +189,21 @@ def inject_css():
 
 
 # ──────────────────────────────────────────────
+#  Color helper for inline progress bars
+# ──────────────────────────────────────────────
+
+def _progress_bar_color(pct: float) -> str:
+    """Return a CSS color based on progress percentage."""
+    if pct >= 100:
+        return "#22c55e"
+    if pct >= 75:
+        return "#22c55e"
+    if pct >= 40:
+        return "#eab308"
+    return "#ef4444"
+
+
+# ──────────────────────────────────────────────
 #  Add OKR dialog (modal popup)
 # ──────────────────────────────────────────────
 
@@ -225,6 +239,118 @@ def add_okr_dialog(quarter: str):
                 st.rerun()
             else:
                 st.warning("Please enter an objective title.")
+
+
+# ──────────────────────────────────────────────
+#  Edit OKR dialog
+# ──────────────────────────────────────────────
+
+@st.dialog("Edit Objective", width="large")
+def edit_okr_dialog(row: pd.Series, quarter: str):
+    st.markdown(
+        "<p style='color:#64748b; margin-bottom:16px;'>Update the objective details.</p>",
+        unsafe_allow_html=True,
+    )
+    title = st.text_input("Objective title", value=str(row.get("title", "")))
+    col1, col2 = st.columns(2)
+    with col1:
+        owner = st.text_input("Owner", value=str(row.get("owner", "")))
+    with col2:
+        target_date = st.text_input("Target date", value=str(row.get("target_date", "")))
+    description = st.text_area("Description", value=str(row.get("description", "")), height=100)
+
+    st.markdown("")
+    c1, c2, c3 = st.columns([2, 1, 1])
+    with c2:
+        if st.button("Cancel", use_container_width=True, key="edit_okr_cancel"):
+            st.rerun()
+    with c3:
+        if st.button("Save", type="primary", use_container_width=True, key="edit_okr_save"):
+            if title.strip():
+                now = datetime.now().strftime("%Y-%m-%d %H:%M")
+                sheets.update_okr_fields(quarter, str(row["id"]), {
+                    "title": title.strip(),
+                    "description": description.strip(),
+                    "owner": owner.strip(),
+                    "target_date": target_date.strip(),
+                    "last_updated": now,
+                })
+                st.cache_data.clear()
+                st.rerun()
+            else:
+                st.warning("Please enter an objective title.")
+
+
+# ──────────────────────────────────────────────
+#  Edit Key Result dialog
+# ──────────────────────────────────────────────
+
+@st.dialog("Edit Key Result", width="large")
+def edit_kr_dialog(row: pd.Series, quarter: str):
+    st.markdown(
+        "<p style='color:#64748b; margin-bottom:16px;'>Update the key result details.</p>",
+        unsafe_allow_html=True,
+    )
+    name = st.text_input("Key Result name", value=str(row.get("name", "")))
+    col1, col2 = st.columns(2)
+    with col1:
+        owner = st.text_input("Owner", value=str(row.get("owner", "")))
+    with col2:
+        unit = st.text_input("Unit (e.g. %, $, users)", value=str(row.get("unit", "")))
+
+    current_dir = str(row.get("direction", "increase")).lower()
+    dir_options = ["increase", "decrease"]
+    dir_index = dir_options.index(current_dir) if current_dir in dir_options else 0
+    direction = st.radio(
+        "Direction",
+        options=dir_options,
+        index=dir_index,
+        horizontal=True,
+        help="Choose 'decrease' for metrics you want to reduce",
+    )
+
+    st.divider()
+
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        baseline_value = st.number_input(
+            "Baseline (start)",
+            value=float(row.get("baseline_value", 0)),
+        )
+    with c2:
+        target_value = st.number_input(
+            "Target" + (" (lower)" if direction == "decrease" else ""),
+            value=float(row.get("target_value", 0)),
+        )
+    with c3:
+        current_value = st.number_input(
+            "Current value",
+            value=float(row.get("current_value", 0)),
+        )
+
+    st.markdown("")
+    btn_c1, btn_c2, btn_c3 = st.columns([2, 1, 1])
+    with btn_c2:
+        if st.button("Cancel", use_container_width=True, key="edit_kr_cancel"):
+            st.rerun()
+    with btn_c3:
+        if st.button("Save", type="primary", use_container_width=True, key="edit_kr_save"):
+            if name.strip():
+                now = datetime.now().strftime("%Y-%m-%d %H:%M")
+                sheets.update_kpi_fields(quarter, str(row["id"]), {
+                    "name": name.strip(),
+                    "owner": owner.strip(),
+                    "unit": unit.strip(),
+                    "direction": direction,
+                    "baseline_value": baseline_value,
+                    "target_value": target_value,
+                    "current_value": current_value,
+                    "last_updated": now,
+                })
+                st.cache_data.clear()
+                st.rerun()
+            else:
+                st.warning("Please enter a Key Result name.")
 
 
 # ──────────────────────────────────────────────
@@ -379,7 +505,7 @@ def render_sidebar(quarter_ref: list):
 
 
 # ──────────────────────────────────────────────
-#  Summary metrics — responsive 2x2 grid on mobile
+#  Summary metrics
 # ──────────────────────────────────────────────
 
 def render_okr_metrics(stats: dict):
@@ -437,7 +563,7 @@ def _progress_emoji(pct: float) -> str:
 
 
 # ──────────────────────────────────────────────
-#  OKR content (inside a tab) — single progress bar
+#  OKR content (inside a tab)
 # ──────────────────────────────────────────────
 
 def _render_okr_content(
@@ -450,10 +576,11 @@ def _render_okr_content(
     okr_id = str(row["id"])
     pct = data.okr_progress_from_krs(okr_id, kpis_df)
     color = data.progress_color(pct)
+    bar_color = _progress_bar_color(pct)
     krs = data.krs_for_okr(okr_id, kpis_df)
 
-    # ── Header: title + overall % (no separate progress bar) ──
-    col1, col2 = st.columns([4, 1])
+    # ── Header: title + edit button + overall % ──
+    col1, col_edit, col2 = st.columns([4, 0.5, 1])
     with col1:
         st.markdown(f"### {row['title']}")
         if row.get("description"):
@@ -461,6 +588,9 @@ def _render_okr_content(
                 f"<p style='color:#64748b; margin-top:-8px;'>{row['description']}</p>",
                 unsafe_allow_html=True,
             )
+    with col_edit:
+        if st.button("✏️", key=f"edit_okr_{okr_id}", help="Edit this objective"):
+            edit_okr_dialog(row, quarter)
     with col2:
         st.markdown(
             f"<div style='text-align:right; padding:4px 0;'>"
@@ -469,6 +599,16 @@ def _render_okr_content(
             f"<br><span style='font-size:0.75rem; color:#94a3b8;'>overall</span></div>",
             unsafe_allow_html=True,
         )
+
+    # ── OKR progress bar (HTML-based, color matches status) ──
+    clamped_pct = max(0.0, min(pct, 100.0))
+    st.markdown(
+        f"<div style='background:#e8e0f0; border-radius:10px; height:10px; width:100%; overflow:hidden;'>"
+        f"<div style='background:{bar_color}; width:{clamped_pct}%; height:100%; border-radius:10px; "
+        f"transition: width 0.4s ease;'></div></div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
 
     # ── Detail pills ──
     st.markdown(
@@ -524,7 +664,7 @@ def _render_okr_content(
 
 
 # ──────────────────────────────────────────────
-#  Key Result card — single progress bar, responsive
+#  Key Result card
 # ──────────────────────────────────────────────
 
 def _render_kr_card(
@@ -535,6 +675,7 @@ def _render_kr_card(
 ):
     achievement = data.kpi_achievement(row)
     color = data.progress_color(achievement)
+    bar_color = _progress_bar_color(achievement)
     kr_id = str(row["id"])
     okr_id = str(row["okr_id"])
     direction = str(row.get("direction", "increase")).lower()
@@ -542,8 +683,8 @@ def _render_kr_card(
     unit = row.get("unit", "")
 
     with st.container(border=True):
-        # ── Row 1: name + update button ──
-        name_col, btn_col = st.columns([5, 1])
+        # ── Row 1: name + edit + update buttons ──
+        name_col, edit_col, btn_col = st.columns([5, 0.5, 1])
         with name_col:
             arrow = "↓" if is_decrease else "↑"
             st.markdown(
@@ -553,6 +694,9 @@ def _render_kr_card(
                 f"<strong style='font-size:1rem;'>{row['name']}</strong>",
                 unsafe_allow_html=True,
             )
+        with edit_col:
+            if st.button("✏️", key=f"edit_kr_{kr_id}", help="Edit this key result"):
+                edit_kr_dialog(row, quarter)
         with btn_col:
             if st.button("Update", key=f"upd_btn_{kr_id}", use_container_width=True):
                 update_kr_dialog(row, okr_id, quarter)
@@ -567,9 +711,15 @@ def _render_kr_card(
         with m3:
             st.metric("Achievement", f"{achievement:.0f}%")
 
-        # ── Single progress bar ──
-        clamped = max(0.0, min(achievement / 100, 1.0))
-        st.progress(clamped)
+        # ── Single progress bar (HTML, color matches status) ──
+        clamped_pct = max(0.0, min(achievement, 100.0))
+        st.markdown(
+            f"<div style='background:#e8e0f0; border-radius:10px; height:8px; width:100%; overflow:hidden;'>"
+            f"<div style='background:{bar_color}; width:{clamped_pct}%; height:100%; border-radius:10px; "
+            f"transition: width 0.4s ease;'></div></div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown("<div style='height:4px;'></div>", unsafe_allow_html=True)
 
         # ── Subtitle info ──
         parts = [f"👤 {row.get('owner', '—')}"]
