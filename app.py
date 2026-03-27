@@ -37,7 +37,7 @@ if "gcp_service_account" not in st.secrets:
     )
     st.stop()
 
-# ── Sidebar (quarter selection + Add OKR form) ──
+# ── Sidebar ──
 quarter_ref = []
 ui.render_sidebar(quarter_ref)
 quarter = quarter_ref[0]
@@ -50,16 +50,16 @@ notes_df = sheets.read_notes()
 
 # ── Header ──
 st.markdown(
-    f"<h2 style='margin-bottom:0;'>{quarter}</h2>",
+    f"<h2 style='margin-bottom:2px; color:#1e293b;'>📊 {quarter}</h2>"
+    f"<p style='color:#94a3b8; margin-top:0;'>Click an objective tab to view key results and progress.</p>",
     unsafe_allow_html=True,
 )
-st.caption("Click an objective tab below to view its key results and progress.")
 
 # ── Summary metrics ──
 stats = data.okr_summary_stats(okrs_df, kpis_df)
 ui.render_okr_metrics(stats)
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("")
 
 # ── OKR tabs ──
 ui.render_okr_tabs(okrs_df, kpis_df, history_df, notes_df, quarter)

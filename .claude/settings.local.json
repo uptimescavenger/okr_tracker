@@ -3,7 +3,10 @@
     "allow": [
       "Bash(ls \"/Users/jineshpatel/OKR Tracker/\"*.json)",
       "Bash(source venv/bin/activate)",
-      "Bash(python3 -c \":*)"
+      "Bash(python3 -c \":*)",
+      "WebSearch",
+      "WebFetch(domain:docs.streamlit.io)",
+      "WebFetch(domain:medium.com)"
     ]
   }
 }

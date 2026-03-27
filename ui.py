@@ -20,73 +20,120 @@ import data
 def inject_css():
     st.markdown("""
     <style>
-    /* Metric cards */
+    /* ── Metric cards ── */
     [data-testid="stMetric"] {
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-        border: 1px solid #475569;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
-        padding: 16px;
+        padding: 16px 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
     [data-testid="stMetric"] label {
-        color: #94a3b8 !important;
-        font-size: 0.8rem !important;
+        color: #64748b !important;
+        font-size: 0.78rem !important;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.06em;
+        font-weight: 600 !important;
     }
     [data-testid="stMetric"] [data-testid="stMetricValue"] {
-        color: #f1f5f9 !important;
         font-size: 1.8rem !important;
         font-weight: 700 !important;
+        color: #1e293b !important;
     }
 
-    /* Progress bars */
+    /* ── Progress bars ── */
     [data-testid="stProgress"] > div > div {
         border-radius: 10px;
-        height: 8px !important;
+        height: 6px !important;
     }
     [data-testid="stProgress"] > div {
-        background-color: #334155 !important;
+        background-color: #e2e8f0 !important;
         border-radius: 10px;
     }
 
-    /* Tabs styling */
+    /* ── Tabs ── */
     [data-testid="stTabs"] button {
         border-radius: 8px 8px 0 0 !important;
         font-weight: 600 !important;
-        padding: 8px 20px !important;
+        padding: 10px 20px !important;
+        font-size: 0.9rem !important;
     }
     [data-testid="stTabs"] button[aria-selected="true"] {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+        background: linear-gradient(135deg, #6366f1, #818cf8) !important;
         color: white !important;
+        border-bottom: none !important;
+    }
+    [data-testid="stTabs"] button[aria-selected="false"] {
+        color: #64748b !important;
     }
 
-    /* Containers */
+    /* ── Containers / cards ── */
     [data-testid="stVerticalBlock"] > div[data-testid="stVerticalBlockBorderWrapper"] {
         border-radius: 12px !important;
-        border-color: #334155 !important;
-        background: #1e293b !important;
+        border-color: #e2e8f0 !important;
+        background: #ffffff !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
 
-    /* Sidebar */
+    /* ── Sidebar ── */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f172a 0%, #1a1f3d 100%) !important;
-    }
-    [data-testid="stSidebar"] .stButton button {
-        width: 100%;
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+        border-right: 1px solid #e2e8f0;
     }
 
-    /* Popover buttons */
+    /* ── Expanders ── */
+    [data-testid="stExpander"] {
+        border-color: #e2e8f0 !important;
+        border-radius: 10px !important;
+        background: #fafbfc;
+    }
+
+    /* ── Popover buttons ── */
     [data-testid="stPopoverButton"] button {
         border-radius: 8px !important;
+        font-weight: 500 !important;
     }
 
-    /* Expanders */
-    [data-testid="stExpander"] {
-        border-color: #334155 !important;
-        border-radius: 8px !important;
+    /* ── Dialog ── */
+    [data-testid="stDialog"] {
+        border-radius: 16px !important;
     }
     </style>
     """, unsafe_allow_html=True)
+
+
+# ──────────────────────────────────────────────
+#  Add OKR dialog (modal popup)
+# ──────────────────────────────────────────────
+
+@st.dialog("Create New Objective", width="large")
+def add_okr_dialog(quarter: str):
+    st.markdown("Add a new objective to track for this quarter.")
+    col1, col2 = st.columns(2)
+    with col1:
+        title = st.text_input("Objective title")
+        owner = st.text_input("Owner")
+    with col2:
+        target_date = st.date_input("Target date")
+    description = st.text_area("Description", height=100)
+
+    st.markdown("")  # spacer
+    c1, c2, c3 = st.columns([2, 1, 1])
+    with c2:
+        if st.button("Cancel", use_container_width=True):
+            st.rerun()
+    with c3:
+        if st.button("Create OKR", type="primary", use_container_width=True):
+            if title.strip():
+                now = datetime.now().strftime("%Y-%m-%d %H:%M")
+                new_id = str(uuid.uuid4())[:8]
+                sheets.add_okr(quarter, [
+                    new_id, title.strip(), description.strip(),
+                    owner.strip(), str(target_date), 0, now,
+                ])
+                st.rerun()
+            else:
+                st.warning("Please enter an objective title.")
 
 
 # ──────────────────────────────────────────────
@@ -94,62 +141,37 @@ def inject_css():
 # ──────────────────────────────────────────────
 
 def render_sidebar(quarter_ref: list):
-    """Render sidebar with quarter selector and Add OKR form."""
+    """Render sidebar with quarter selector and new OKR button."""
     with st.sidebar:
         st.markdown(
-            "<h1 style='text-align:center; "
-            "background: linear-gradient(135deg, #6366f1, #a78bfa, #ec4899); "
+            "<h1 style='text-align:center; margin-bottom:0;'>"
+            "<span style='background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7); "
             "-webkit-background-clip: text; -webkit-text-fill-color: transparent; "
-            "font-size: 1.6rem;'>"
-            "OKR Tracker</h1>",
+            "font-size: 1.5rem;'>OKR Tracker</span></h1>"
+            "<p style='text-align:center; color:#94a3b8; font-size:0.8rem; margin-top:2px;'>"
+            "Track objectives & key results</p>",
             unsafe_allow_html=True,
         )
-        st.caption("Track objectives & key results")
         st.divider()
 
         quarters = config.quarter_list()
         current_q = config.current_quarter()
         default_idx = quarters.index(current_q) if current_q in quarters else len(quarters) - 1
 
-        selected = st.selectbox(
-            "Quarter",
-            options=quarters,
-            index=default_idx,
-        )
+        selected = st.selectbox("Quarter", options=quarters, index=default_idx)
         quarter_ref.append(selected)
 
         st.divider()
 
-        # ── Add OKR in sidebar ──
-        st.markdown("**Create New Objective**")
-        _render_sidebar_add_okr(selected)
+        # New OKR button launches the dialog
+        if st.button("➕  New Objective", use_container_width=True, type="primary"):
+            add_okr_dialog(selected)
 
         st.divider()
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Refresh", use_container_width=True):
-                st.cache_data.clear()
-                st.rerun()
-        with col2:
-            st.caption("Auto-syncs every 2 min")
-
-
-def _render_sidebar_add_okr(quarter: str):
-    with st.form("sidebar_add_okr", clear_on_submit=True):
-        title = st.text_input("Objective title")
-        description = st.text_area("Description", height=80)
-        owner = st.text_input("Owner")
-        target_date = st.date_input("Target date")
-        submitted = st.form_submit_button("Create OKR", use_container_width=True)
-        if submitted and title.strip():
-            now = datetime.now().strftime("%Y-%m-%d %H:%M")
-            new_id = str(uuid.uuid4())[:8]
-            sheets.add_okr(quarter, [
-                new_id, title.strip(), description.strip(),
-                owner.strip(), str(target_date), 0, now,
-            ])
-            st.success(f"Created!")
+        if st.button("🔄  Refresh Data", use_container_width=True):
+            st.cache_data.clear()
             st.rerun()
+        st.caption("Auto-syncs from Google Sheets every 2 min.")
 
 
 # ──────────────────────────────────────────────
@@ -165,7 +187,7 @@ def render_okr_metrics(stats: dict):
 
 
 # ──────────────────────────────────────────────
-#  OKR tabs (one tab per OKR to reduce scrolling)
+#  OKR tabs
 # ──────────────────────────────────────────────
 
 def render_okr_tabs(
@@ -177,15 +199,15 @@ def render_okr_tabs(
 ):
     if okrs_df.empty:
         st.markdown(
-            "<div style='text-align:center; padding:60px 20px; color:#64748b;'>"
-            "<h3>No objectives yet</h3>"
-            "<p>Create your first OKR using the sidebar.</p>"
-            "</div>",
+            "<div style='text-align:center; padding:80px 20px;'>"
+            "<p style='font-size:3rem; margin-bottom:8px;'>🎯</p>"
+            "<h3 style='color:#475569;'>No objectives yet</h3>"
+            "<p style='color:#94a3b8;'>Click <strong>New Objective</strong> "
+            "in the sidebar to get started.</p></div>",
             unsafe_allow_html=True,
         )
         return
 
-    # Create tabs — one per OKR
     tab_labels = []
     for _, row in okrs_df.iterrows():
         okr_id = str(row["id"])
@@ -194,7 +216,6 @@ def render_okr_tabs(
         tab_labels.append(f"{emoji} {row['title']}")
 
     tabs = st.tabs(tab_labels)
-
     for i, (_, row) in enumerate(okrs_df.iterrows()):
         with tabs[i]:
             _render_okr_content(row, kpis_df, history_df, notes_df, quarter)
@@ -210,6 +231,10 @@ def _progress_emoji(pct: float) -> str:
     return "🔴"
 
 
+# ──────────────────────────────────────────────
+#  OKR content (inside a tab)
+# ──────────────────────────────────────────────
+
 def _render_okr_content(
     row: pd.Series,
     kpis_df: pd.DataFrame,
@@ -222,51 +247,61 @@ def _render_okr_content(
     color = data.progress_color(pct)
     krs = data.krs_for_okr(okr_id, kpis_df)
 
-    # ── OKR header ──
+    # ── Header row ──
     col1, col2 = st.columns([4, 1])
     with col1:
         st.markdown(f"### {row['title']}")
         if row.get("description"):
-            st.markdown(f"*{row['description']}*")
+            st.markdown(
+                f"<p style='color:#64748b; margin-top:-8px;'>{row['description']}</p>",
+                unsafe_allow_html=True,
+            )
     with col2:
         st.markdown(
-            f"<div style='text-align:right; padding:8px;'>"
-            f"<span style='font-size:2.5rem; font-weight:800; "
-            f"background: linear-gradient(135deg, {color}, {color}aa); "
-            f"-webkit-background-clip: text; -webkit-text-fill-color: transparent;'>"
+            f"<div style='text-align:right; padding:4px 0;'>"
+            f"<span style='font-size:2.8rem; font-weight:800; color:{color};'>"
             f"{pct:.0f}%</span></div>",
             unsafe_allow_html=True,
         )
 
     st.progress(max(0.0, min(pct / 100, 1.0)))
 
-    # Detail chips
+    # ── Detail pills ──
     st.markdown(
-        f"<div style='display:flex; gap:16px; flex-wrap:wrap; margin:4px 0 16px 0;'>"
-        f"<span style='background:#334155; padding:4px 12px; border-radius:20px; font-size:0.85rem;'>"
+        f"<div style='display:flex; gap:10px; flex-wrap:wrap; margin:8px 0 20px 0;'>"
+        f"<span style='background:#f1f5f9; color:#475569; padding:5px 14px; "
+        f"border-radius:20px; font-size:0.82rem; border:1px solid #e2e8f0;'>"
         f"👤 {row.get('owner', '—')}</span>"
-        f"<span style='background:#334155; padding:4px 12px; border-radius:20px; font-size:0.85rem;'>"
+        f"<span style='background:#f1f5f9; color:#475569; padding:5px 14px; "
+        f"border-radius:20px; font-size:0.82rem; border:1px solid #e2e8f0;'>"
         f"📅 {row.get('target_date', '—')}</span>"
-        f"<span style='background:#334155; padding:4px 12px; border-radius:20px; font-size:0.85rem;'>"
+        f"<span style='background:#f1f5f9; color:#475569; padding:5px 14px; "
+        f"border-radius:20px; font-size:0.82rem; border:1px solid #e2e8f0;'>"
         f"🔄 {row.get('last_updated', '—')}</span>"
         f"</div>",
         unsafe_allow_html=True,
     )
 
-    # ── Key Results ──
-    kr_header_col, kr_add_col = st.columns([4, 1])
+    # ── Key Results header + add button ──
+    kr_header_col, kr_add_col = st.columns([5, 1])
     with kr_header_col:
-        st.markdown(f"**Key Results** ({len(krs)})")
+        st.markdown(f"#### Key Results ({len(krs)})")
     with kr_add_col:
         _render_add_kr_form(okr_id, quarter)
 
     if krs.empty:
-        st.info("No Key Results yet — click **+ Add Key Result** to get started.")
+        st.markdown(
+            "<div style='text-align:center; padding:40px; background:#f8fafc; "
+            "border-radius:12px; border:1px dashed #cbd5e1;'>"
+            "<p style='color:#94a3b8; margin:0;'>No Key Results yet — "
+            "click <strong>+ Add Key Result</strong> to get started.</p></div>",
+            unsafe_allow_html=True,
+        )
     else:
         for _, kr in krs.iterrows():
             _render_kr_card(kr, history_df, notes_df, quarter)
 
-    # ── OKR-level notes ──
+    # ── OKR notes ──
     okr_notes = data.notes_for(notes_df, "OKR", okr_id)
     with st.expander(f"📝 Objective Notes ({len(okr_notes)})"):
         if okr_notes.empty:
@@ -295,34 +330,34 @@ def _render_kr_card(
     is_decrease = direction == "decrease"
 
     with st.container(border=True):
-        # Row 1: name, values, achievement, update button
+        # ── Top row: name, metrics, achievement, update ──
         c1, c2, c3, c4, c5 = st.columns([3, 1.2, 1.2, 0.8, 0.8])
         with c1:
             arrow = "↓" if is_decrease else "↑"
             st.markdown(
-                f"<span style='color:{color}; font-size:1.1rem; margin-right:6px;'>{arrow}</span>"
-                f"<strong>{row['name']}</strong>",
+                f"<span style='display:inline-block; background:{color}18; color:{color}; "
+                f"width:24px; height:24px; border-radius:6px; text-align:center; "
+                f"line-height:24px; font-size:0.85rem; margin-right:8px;'>{arrow}</span>"
+                f"<strong style='font-size:1rem;'>{row['name']}</strong>",
                 unsafe_allow_html=True,
             )
-            owner_text = row.get('owner', '—')
-            updated_text = row.get('last_updated', '—')
-            st.caption(f"👤 {owner_text}  |  🔄 {updated_text}")
+            st.caption(f"👤 {row.get('owner', '—')}  ·  🔄 {row.get('last_updated', '—')}")
         with c2:
             st.metric("Current", data.format_value(row['current_value'], row.get('unit', '')))
         with c3:
-            target_label = "Target ↓" if is_decrease else "Target"
-            st.metric(target_label, data.format_value(row['target_value'], row.get('unit', '')))
+            label = "Target ↓" if is_decrease else "Target"
+            st.metric(label, data.format_value(row['target_value'], row.get('unit', '')))
         with c4:
             st.markdown(
-                f"<div style='text-align:center; padding-top:8px;'>"
-                f"<span style='color:{color}; font-weight:800; font-size:1.4rem;'>"
+                f"<div style='text-align:center; padding-top:6px;'>"
+                f"<span style='font-size:1.5rem; font-weight:800; color:{color};'>"
                 f"{achievement:.0f}%</span></div>",
                 unsafe_allow_html=True,
             )
         with c5:
             _render_kr_update_form(row, okr_id, quarter)
 
-        # Progress bar
+        # ── Progress bar ──
         clamped = max(0.0, min(achievement / 100, 1.0))
         st.progress(clamped)
 
@@ -333,7 +368,7 @@ def _render_kr_card(
                 f"Target: {data.format_value(row['target_value'], unit)} (lower is better)"
             )
 
-        # Trend chart + notes side by side
+        # ── Trend chart + notes ──
         trend = data.build_kpi_trend(history_df, kr_id)
         kr_notes = data.notes_for(notes_df, "KR", kr_id)
 
@@ -351,32 +386,37 @@ def _render_kr_card(
                 _render_note_form("KR", kr_id)
 
 
+# ──────────────────────────────────────────────
+#  Modern chart
+# ──────────────────────────────────────────────
+
 def _render_modern_chart(trend: pd.DataFrame, row: pd.Series, is_decrease: bool):
-    """Render a modern area chart with gradient fill."""
-    color_main = "#8b5cf6"
-    color_fill = "rgba(139, 92, 246, 0.15)"
-    target_color = "#22c55e" if is_decrease else "#f43f5e"
+    """Area chart with gradient fill, modern styling."""
+    line_color = "#6366f1"
+    fill_color = "rgba(99, 102, 241, 0.08)"
+    target_color = "#22c55e" if is_decrease else "#ef4444"
 
     fig = go.Figure()
 
-    # Area fill
     fig.add_trace(go.Scatter(
         x=trend["date"], y=trend["value"],
         fill="tozeroy",
-        fillcolor=color_fill,
-        line=dict(color=color_main, width=3, shape="spline"),
+        fillcolor=fill_color,
+        line=dict(color=line_color, width=2.5, shape="spline"),
         mode="lines+markers",
-        marker=dict(size=8, color=color_main, line=dict(width=2, color="#0f172a")),
+        marker=dict(
+            size=7, color="#ffffff",
+            line=dict(width=2, color=line_color),
+        ),
         name="Value",
-        hovertemplate="%{x|%b %d}<br>%{y:.1f}<extra></extra>",
+        hovertemplate="%{x|%b %d, %Y}<br><b>%{y:.1f}</b><extra></extra>",
     ))
 
-    # Target line
     fig.add_hline(
         y=float(row["target_value"]),
         line_dash="dot",
         line_color=target_color,
-        line_width=2,
+        line_width=1.5,
         annotation_text="Target",
         annotation_font_color=target_color,
         annotation_font_size=11,
@@ -384,27 +424,27 @@ def _render_modern_chart(trend: pd.DataFrame, row: pd.Series, is_decrease: bool)
 
     fig.update_layout(
         height=200,
-        margin=dict(l=0, r=0, t=10, b=0),
+        margin=dict(l=0, r=0, t=8, b=0),
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         xaxis=dict(
             showgrid=False,
-            tickfont=dict(color="#64748b", size=10),
+            tickfont=dict(color="#94a3b8", size=10),
             linecolor="rgba(0,0,0,0)",
         ),
         yaxis=dict(
             showgrid=True,
-            gridcolor="rgba(71,85,105,0.3)",
-            tickfont=dict(color="#64748b", size=10),
+            gridcolor="rgba(226,232,240,0.6)",
+            tickfont=dict(color="#94a3b8", size=10),
             linecolor="rgba(0,0,0,0)",
-            title=dict(text=row.get("unit", ""), font=dict(color="#64748b", size=10)),
+            title=dict(text=row.get("unit", ""), font=dict(color="#94a3b8", size=10)),
         ),
         showlegend=False,
         hoverlabel=dict(
-            bgcolor="#1e293b",
+            bgcolor="#ffffff",
             font_size=12,
-            font_color="#e2e8f0",
-            bordercolor="#6366f1",
+            font_color="#1e293b",
+            bordercolor="#e2e8f0",
         ),
     )
 
@@ -412,7 +452,7 @@ def _render_modern_chart(trend: pd.DataFrame, row: pd.Series, is_decrease: bool)
 
 
 # ──────────────────────────────────────────────
-#  Update / Note / Add KR forms
+#  Forms: update KR, add note, add KR
 # ──────────────────────────────────────────────
 
 def _render_kr_update_form(row: pd.Series, okr_id: str, quarter: str):
@@ -425,12 +465,10 @@ def _render_kr_update_form(row: pd.Series, okr_id: str, quarter: str):
         )
         note_author = st.text_input("Your name", key=f"{key_prefix}_author")
         note_text = st.text_area("Add a note (optional)", key=f"{key_prefix}_note", height=80)
-        if st.button("Save", key=f"{key_prefix}_save", use_container_width=True):
+        if st.button("Save", key=f"{key_prefix}_save", type="primary", use_container_width=True):
             now = datetime.now().strftime("%Y-%m-%d %H:%M")
             try:
-                sheets.update_kpi_value(
-                    quarter, str(row["id"]), okr_id, new_value, now
-                )
+                sheets.update_kpi_value(quarter, str(row["id"]), okr_id, new_value, now)
                 if note_text.strip() and note_author.strip():
                     sheets.add_note("KR", str(row["id"]), note_author.strip(), note_text.strip(), now)
                 st.success("Saved!")
@@ -500,7 +538,7 @@ def _render_add_kr_form(okr_id: str, quarter: str):
 
         unit = st.text_input("Unit (e.g. %, $, users)", key=f"{key_prefix}_unit")
 
-        if st.button("Create", key=f"{key_prefix}_btn", use_container_width=True):
+        if st.button("Create", key=f"{key_prefix}_btn", type="primary", use_container_width=True):
             if name.strip():
                 now = datetime.now().strftime("%Y-%m-%d %H:%M")
                 new_id = str(uuid.uuid4())[:8]
