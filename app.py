@@ -18,6 +18,22 @@ st.set_page_config(
     layout="wide",
 )
 
+# ── Check secrets are configured ──
+if config.SPREADSHEET_ID == "YOUR_SPREADSHEET_ID_HERE":
+    st.error(
+        "**SPREADSHEET_ID not found in secrets.** "
+        "Go to Manage app → Settings → Secrets and add your secrets. "
+        f"Available secret keys: {list(st.secrets) if hasattr(st.secrets, '__iter__') else 'none'}"
+    )
+    st.stop()
+
+if "gcp_service_account" not in st.secrets:
+    st.error(
+        "**gcp_service_account not found in secrets.** "
+        "Make sure your secrets.toml includes the [gcp_service_account] section."
+    )
+    st.stop()
+
 # ── Sidebar → quarter selection ──
 quarter = ui.render_sidebar()
 

@@ -11,7 +11,10 @@ from datetime import date
 # ---------- Google Sheets ----------
 # The ID from your Google Sheet URL:
 # https://docs.google.com/spreadsheets/d/<SPREADSHEET_ID>/edit
-SPREADSHEET_ID = st.secrets.get("SPREADSHEET_ID", "YOUR_SPREADSHEET_ID_HERE")
+try:
+    SPREADSHEET_ID = st.secrets["SPREADSHEET_ID"]
+except (KeyError, FileNotFoundError):
+    SPREADSHEET_ID = "YOUR_SPREADSHEET_ID_HERE"
 
 # ---------- Quarter helpers ----------
 def current_quarter() -> str:
