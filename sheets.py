@@ -41,7 +41,15 @@ def _get_client() -> gspread.Client:
 
 def _get_spreadsheet() -> gspread.Spreadsheet:
     client = _get_client()
-    return client.open_by_key(config.SPREADSHEET_ID)
+    try:
+        return client.open_by_key(config.SPREADSHEET_ID)
+    except gspread.exceptions.APIError as e:
+        st.error(
+            f"**Google Sheets API Error:** {e}\n\n"
+            f"Spreadsheet ID: `{config.SPREADSHEET_ID}`\n\n"
+            f"Service account email: `{dict(st.secrets.get('gcp_service_account', {})).get('client_email', 'unknown')}`"
+        )
+        st.stop()
 
 
 # ---------- Worksheet helpers ----------
