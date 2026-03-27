@@ -136,10 +136,10 @@ def _render_kr_card(
             label = "▼ " if is_decrease else ""
             st.markdown(f"**{label}{row['name']}**")
         with c2:
-            st.metric("Current", f"{row['current_value']} {row.get('unit', '')}")
+            st.metric("Current", data.format_value(row['current_value'], row.get('unit', '')))
         with c3:
             target_label = "Target (↓)" if is_decrease else "Target"
-            st.metric(target_label, f"{row['target_value']} {row.get('unit', '')}")
+            st.metric(target_label, data.format_value(row['target_value'], row.get('unit', '')))
         with c4:
             st.markdown(
                 f"<span style='color:{color}; font-weight:bold; font-size:1.2em'>"
@@ -150,9 +150,10 @@ def _render_kr_card(
         clamped = max(0.0, min(achievement / 100, 1.0))
         st.progress(clamped)
         if is_decrease:
+            unit = row.get('unit', '')
             st.caption(
-                f"Baseline: {row.get('baseline_value', '—')} {row.get('unit', '')} → "
-                f"Target: {row['target_value']} {row.get('unit', '')} (lower is better)"
+                f"Baseline: {data.format_value(row.get('baseline_value', '—'), unit)} → "
+                f"Target: {data.format_value(row['target_value'], unit)} (lower is better)"
             )
         st.caption(
             f"Owner: {row.get('owner', '—')} | Updated: {row.get('last_updated', '—')}"

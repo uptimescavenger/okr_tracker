@@ -89,6 +89,17 @@ def notes_for(notes_df: pd.DataFrame, parent_type: str, parent_id: str) -> pd.Da
     return subset.sort_values("timestamp", ascending=False)
 
 
+PREFIX_UNITS = {"$", "£", "€", "¥", "₹", "₩", "R$", "CHF"}
+
+
+def format_value(value, unit: str) -> str:
+    """Format a value with its unit, placing currency symbols before the number."""
+    unit = str(unit).strip()
+    if unit in PREFIX_UNITS:
+        return f"{unit}{value}"
+    return f"{value} {unit}".strip()
+
+
 def progress_color(pct: float) -> str:
     """Return a CSS-friendly colour based on progress percentage."""
     if pct >= 75:
