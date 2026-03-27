@@ -27,6 +27,9 @@ def _get_client() -> gspread.Client:
     # Streamlit Cloud stores secrets as a dict under [gcp_service_account]
     if "gcp_service_account" in st.secrets:
         creds_info = dict(st.secrets["gcp_service_account"])
+        # Fix private_key newlines — Streamlit Cloud TOML can mangle \n
+        if "private_key" in creds_info:
+            creds_info["private_key"] = creds_info["private_key"].replace("\\n", "\n")
         creds = Credentials.from_service_account_info(creds_info, scopes=SCOPES)
     else:
         # Local dev: read from file
