@@ -168,8 +168,41 @@ def inject_css():
         color: #475569 !important;
     }}
 
-    /* ── Update button — black outline, transparent bg, full round ── */
-    .update-btn button {{
+    /* ── FORCE all buttons to have full 10px rounded corners ── */
+    button,
+    [data-testid="stBaseButton-secondary"] button,
+    [data-testid="stBaseButton-primary"] button,
+    [data-testid="baseButton-secondary"],
+    [data-testid="baseButton-primary"],
+    .stButton > button {{
+        border-radius: {BR} !important;
+    }}
+
+    /* ── Pencil edit button — looks like a small icon button ── */
+    [data-testid="stBaseButton-secondary"].pencil-edit button,
+    .pencil-edit > button,
+    .pencil-edit button {{
+        background: transparent !important;
+        border: 1.5px solid #94a3b8 !important;
+        color: #64748b !important;
+        box-shadow: none !important;
+        padding: 4px 8px !important;
+        min-height: 32px !important;
+        max-height: 32px !important;
+        border-radius: {BR} !important;
+        font-size: 0.8rem !important;
+        transition: all 0.15s ease;
+    }}
+    .pencil-edit button:hover {{
+        background: #f1f5f9 !important;
+        border-color: #475569 !important;
+        color: #1e293b !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }}
+
+    /* ── Update button — black outline, transparent bg ── */
+    .kr-update-btn button {{
         background: transparent !important;
         border: 1.5px solid #1e293b !important;
         color: #1e293b !important;
@@ -178,25 +211,10 @@ def inject_css():
         font-weight: 600 !important;
         transition: all 0.15s ease;
     }}
-    .update-btn button:hover {{
+    .kr-update-btn button:hover {{
         background: #f1f5f9 !important;
         border-color: #000000 !important;
         color: #000000 !important;
-        transform: none !important;
-        box-shadow: none !important;
-    }}
-
-    /* ── Edit (pencil) button — minimal, no border ── */
-    .edit-btn button {{
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 2px 6px !important;
-        min-height: 0 !important;
-        line-height: 1 !important;
-    }}
-    .edit-btn button:hover {{
-        background: #f1f5f9 !important;
         transform: none !important;
         box-shadow: none !important;
     }}
@@ -665,33 +683,28 @@ def _render_okr_content(
     bar_color = _progress_bar_color(pct)
     krs = data.krs_for_okr(okr_id, kpis_df)
 
-    # ── Header: title with inline pencil + overall % ──
-    col1, col2 = st.columns([5, 1])
-    with col1:
-        # Title with pencil icon right next to it
-        st.markdown(
-            f"<div style='display:flex; align-items:center; gap:8px;'>"
-            f"<h3 style='margin:0;'>{row['title']}</h3>"
-            f"</div>",
-            unsafe_allow_html=True,
-        )
-        # Edit button right below title, tight spacing
-        with st.container():
-            st.markdown('<div class="edit-btn">', unsafe_allow_html=True)
-            if st.button(f"Edit", key=f"edit_okr_{okr_id}", help="Edit this objective"):
-                edit_okr_dialog(row, quarter)
-            st.markdown('</div>', unsafe_allow_html=True)
-        if row.get("description"):
-            st.markdown(
-                f"<p style='color:#64748b; margin-top:-4px;'>{row['description']}</p>",
-                unsafe_allow_html=True,
-            )
-    with col2:
+    # ── Header: title + pencil on same row, then % ──
+    title_col, pencil_col, pct_col = st.columns([4, 0.6, 1])
+    with title_col:
+        st.markdown(f"### {row['title']}")
+    with pencil_col:
+        # Pencil icon button — inline SVG as label
+        pencil = _pencil_svg(18)
+        st.markdown('<div class="pencil-edit">', unsafe_allow_html=True)
+        if st.button(f"✎ Edit", key=f"edit_okr_{okr_id}", help="Edit this objective"):
+            edit_okr_dialog(row, quarter)
+        st.markdown('</div>', unsafe_allow_html=True)
+    with pct_col:
         st.markdown(
             f"<div style='text-align:right; padding:4px 0;'>"
             f"<span class='okr-pct' style='font-size:2.5rem; font-weight:800; color:{color};'>"
             f"{pct:.0f}%</span>"
             f"<br><span style='font-size:0.75rem; color:#94a3b8;'>overall</span></div>",
+            unsafe_allow_html=True,
+        )
+    if row.get("description"):
+        st.markdown(
+            f"<p style='color:#64748b; margin-top:-8px;'>{row['description']}</p>",
             unsafe_allow_html=True,
         )
 
@@ -778,8 +791,8 @@ def _render_kr_card(
     unit = row.get("unit", "")
 
     with st.container(border=True):
-        # ── Row 1: name with inline edit + update button ──
-        name_col, btn_col = st.columns([5, 1])
+        # ── Row 1: name + pencil edit + update button ──
+        name_col, pencil_col, btn_col = st.columns([4, 0.6, 1])
         with name_col:
             arrow = "↓" if is_decrease else "↑"
             st.markdown(
@@ -792,15 +805,13 @@ def _render_kr_card(
                 f"</div>",
                 unsafe_allow_html=True,
             )
-            # Edit button tight under name
-            with st.container():
-                st.markdown('<div class="edit-btn">', unsafe_allow_html=True)
-                if st.button("Edit", key=f"edit_kr_{kr_id}", help="Edit this key result"):
-                    edit_kr_dialog(row, quarter)
-                st.markdown('</div>', unsafe_allow_html=True)
+        with pencil_col:
+            st.markdown('<div class="pencil-edit">', unsafe_allow_html=True)
+            if st.button("✎ Edit", key=f"edit_kr_{kr_id}", help="Edit this key result"):
+                edit_kr_dialog(row, quarter)
+            st.markdown('</div>', unsafe_allow_html=True)
         with btn_col:
-            # Update button with black outline styling
-            st.markdown('<div class="update-btn">', unsafe_allow_html=True)
+            st.markdown('<div class="kr-update-btn">', unsafe_allow_html=True)
             if st.button("Update", key=f"upd_btn_{kr_id}", use_container_width=True):
                 update_kr_dialog(row, okr_id, quarter)
             st.markdown('</div>', unsafe_allow_html=True)
