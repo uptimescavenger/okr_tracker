@@ -178,25 +178,21 @@ def inject_css():
         border-radius: {BR} !important;
     }}
 
-    /* ── Pencil edit button — looks like a small icon button ── */
-    [data-testid="stBaseButton-secondary"].pencil-edit button,
-    .pencil-edit > button,
+    /* ── Pencil edit button — icon + text only, no border/bg ── */
     .pencil-edit button {{
         background: transparent !important;
-        border: 1.5px solid #94a3b8 !important;
+        border: none !important;
         color: #64748b !important;
         box-shadow: none !important;
-        padding: 4px 8px !important;
-        min-height: 32px !important;
-        max-height: 32px !important;
-        border-radius: {BR} !important;
+        padding: 2px 4px !important;
+        min-height: 0 !important;
         font-size: 0.8rem !important;
-        transition: all 0.15s ease;
+        transition: color 0.15s ease;
     }}
     .pencil-edit button:hover {{
-        background: #f1f5f9 !important;
-        border-color: #475569 !important;
-        color: #1e293b !important;
+        background: transparent !important;
+        border: none !important;
+        color: #6366f1 !important;
         transform: none !important;
         box-shadow: none !important;
     }}
