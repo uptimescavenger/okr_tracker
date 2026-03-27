@@ -20,83 +20,149 @@ import data
 def inject_css():
     st.markdown("""
     <style>
+    /* ── Global ── */
+    .stApp {
+        background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #fff1f2 100%) !important;
+    }
+
     /* ── Metric cards ── */
     [data-testid="stMetric"] {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 16px 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        border-radius: 14px;
+        padding: 18px 22px;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.06);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    [data-testid="stMetric"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.12);
     }
     [data-testid="stMetric"] label {
-        color: #64748b !important;
-        font-size: 0.78rem !important;
+        color: #6366f1 !important;
+        font-size: 0.75rem !important;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
-        font-weight: 600 !important;
+        letter-spacing: 0.08em;
+        font-weight: 700 !important;
     }
     [data-testid="stMetric"] [data-testid="stMetricValue"] {
         font-size: 1.8rem !important;
-        font-weight: 700 !important;
+        font-weight: 800 !important;
         color: #1e293b !important;
     }
 
     /* ── Progress bars ── */
     [data-testid="stProgress"] > div > div {
         border-radius: 10px;
-        height: 6px !important;
+        height: 8px !important;
+        background: linear-gradient(90deg, #6366f1, #a855f7) !important;
     }
     [data-testid="stProgress"] > div {
-        background-color: #e2e8f0 !important;
+        background-color: #e8e0f0 !important;
         border-radius: 10px;
     }
 
     /* ── Tabs ── */
     [data-testid="stTabs"] button {
-        border-radius: 8px 8px 0 0 !important;
+        border-radius: 10px 10px 0 0 !important;
         font-weight: 600 !important;
-        padding: 10px 20px !important;
-        font-size: 0.9rem !important;
+        padding: 10px 22px !important;
+        font-size: 0.88rem !important;
+        transition: all 0.2s ease;
     }
     [data-testid="stTabs"] button[aria-selected="true"] {
-        background: linear-gradient(135deg, #6366f1, #818cf8) !important;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
         color: white !important;
         border-bottom: none !important;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
     }
     [data-testid="stTabs"] button[aria-selected="false"] {
         color: #64748b !important;
+        background: #f1f0fb !important;
+    }
+    [data-testid="stTabs"] button[aria-selected="false"]:hover {
+        background: #e8e5f5 !important;
+        color: #4338ca !important;
     }
 
     /* ── Containers / cards ── */
     [data-testid="stVerticalBlock"] > div[data-testid="stVerticalBlockBorderWrapper"] {
-        border-radius: 12px !important;
+        border-radius: 14px !important;
         border-color: #e2e8f0 !important;
         background: #ffffff !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.05);
     }
 
     /* ── Sidebar ── */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
-        border-right: 1px solid #e2e8f0;
+        background: linear-gradient(180deg, #f8f7ff 0%, #f3f0ff 50%, #faf5ff 100%) !important;
+        border-right: 1px solid #e2e0f0;
     }
 
     /* ── Expanders ── */
     [data-testid="stExpander"] {
-        border-color: #e2e8f0 !important;
-        border-radius: 10px !important;
-        background: #fafbfc;
-    }
-
-    /* ── Popover buttons ── */
-    [data-testid="stPopoverButton"] button {
-        border-radius: 8px !important;
-        font-weight: 500 !important;
+        border: 1px solid #e2e0f0 !important;
+        border-radius: 12px !important;
+        background: #faf9ff !important;
     }
 
     /* ── Dialog ── */
     [data-testid="stDialog"] {
-        border-radius: 16px !important;
+        border-radius: 18px !important;
+    }
+    [data-testid="stDialog"] [data-testid="stVerticalBlock"] {
+        background: #ffffff !important;
+    }
+
+    /* ── Note input borders ── */
+    [data-testid="stTextArea"] textarea,
+    [data-testid="stTextInput"] input {
+        border: 2px solid #d4d0e8 !important;
+        border-radius: 10px !important;
+        background: #ffffff !important;
+    }
+    [data-testid="stTextArea"] textarea:focus,
+    [data-testid="stTextInput"] input:focus {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
+    }
+
+    /* ── Number inputs ── */
+    [data-testid="stNumberInput"] input {
+        border: 2px solid #d4d0e8 !important;
+        border-radius: 10px !important;
+    }
+    [data-testid="stNumberInput"] input:focus {
+        border-color: #6366f1 !important;
+    }
+
+    /* ── New Objective button in sidebar ── */
+    [data-testid="stSidebar"] button[kind="primary"] {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        font-weight: 700 !important;
+        font-size: 0.9rem !important;
+        padding: 12px 20px !important;
+        box-shadow: 0 3px 12px rgba(99, 102, 241, 0.3);
+        transition: all 0.2s ease;
+    }
+    [data-testid="stSidebar"] button[kind="primary"]:hover {
+        box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+        transform: translateY(-1px);
+    }
+
+    /* ── General primary buttons ── */
+    button[kind="primary"] {
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+    }
+
+    /* ── Selectbox ── */
+    [data-testid="stSelectbox"] > div > div {
+        border: 2px solid #d4d0e8 !important;
+        border-radius: 10px !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -108,7 +174,10 @@ def inject_css():
 
 @st.dialog("Create New Objective", width="large")
 def add_okr_dialog(quarter: str):
-    st.markdown("Add a new objective to track for this quarter.")
+    st.markdown(
+        "<p style='color:#64748b; margin-bottom:16px;'>Add a new objective to track for this quarter.</p>",
+        unsafe_allow_html=True,
+    )
     col1, col2 = st.columns(2)
     with col1:
         title = st.text_input("Objective title")
@@ -117,13 +186,13 @@ def add_okr_dialog(quarter: str):
         target_date = st.date_input("Target date")
     description = st.text_area("Description", height=100)
 
-    st.markdown("")  # spacer
+    st.markdown("")
     c1, c2, c3 = st.columns([2, 1, 1])
     with c2:
         if st.button("Cancel", use_container_width=True):
             st.rerun()
     with c3:
-        if st.button("Create OKR", type="primary", use_container_width=True):
+        if st.button("Create Objective", type="primary", use_container_width=True):
             if title.strip():
                 now = datetime.now().strftime("%Y-%m-%d %H:%M")
                 new_id = str(uuid.uuid4())[:8]
@@ -131,9 +200,136 @@ def add_okr_dialog(quarter: str):
                     new_id, title.strip(), description.strip(),
                     owner.strip(), str(target_date), 0, now,
                 ])
+                st.cache_data.clear()
                 st.rerun()
             else:
                 st.warning("Please enter an objective title.")
+
+
+# ──────────────────────────────────────────────
+#  Add Key Result dialog (modal popup)
+# ──────────────────────────────────────────────
+
+@st.dialog("Add Key Result", width="large")
+def add_kr_dialog(okr_id: str, quarter: str):
+    st.markdown(
+        "<p style='color:#64748b; margin-bottom:16px;'>Define a measurable key result for this objective.</p>",
+        unsafe_allow_html=True,
+    )
+
+    col1, col2 = st.columns(2)
+    with col1:
+        name = st.text_input("Key Result name")
+        owner = st.text_input("Owner")
+    with col2:
+        unit = st.text_input("Unit (e.g. %, $, users)")
+        direction = st.radio(
+            "Direction",
+            options=["increase", "decrease"],
+            horizontal=True,
+            help="Choose 'decrease' for metrics you want to reduce (e.g. cost, churn)",
+        )
+
+    st.divider()
+
+    if direction == "decrease":
+        st.markdown(
+            "<p style='color:#8b5cf6; font-size:0.85rem; font-weight:600;'>"
+            "Lower is better — tracks how much you've reduced from baseline.</p>",
+            unsafe_allow_html=True,
+        )
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            baseline_value = st.number_input(
+                "Starting value (baseline)", value=0.0,
+                help="The value you're starting from (e.g. $600)",
+            )
+        with c2:
+            current_value = st.number_input(
+                "Current value", value=baseline_value,
+            )
+        with c3:
+            target_value = st.number_input(
+                "Target value (lower)", value=0.0,
+                help="The value you want to reach (e.g. $500)",
+            )
+    else:
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            baseline_value = st.number_input(
+                "Starting value (baseline)", value=0.0,
+            )
+        with c2:
+            current_value = st.number_input(
+                "Current value", value=0.0,
+            )
+        with c3:
+            target_value = st.number_input(
+                "Target value", value=100.0,
+            )
+
+    st.markdown("")
+    btn_c1, btn_c2, btn_c3 = st.columns([2, 1, 1])
+    with btn_c2:
+        if st.button("Cancel", use_container_width=True, key="kr_cancel"):
+            st.rerun()
+    with btn_c3:
+        if st.button("Create Key Result", type="primary", use_container_width=True, key="kr_create"):
+            if name.strip():
+                now = datetime.now().strftime("%Y-%m-%d %H:%M")
+                new_id = str(uuid.uuid4())[:8]
+                sheets.add_kpi(quarter, [
+                    new_id, okr_id, name.strip(), owner.strip(),
+                    current_value, target_value, baseline_value,
+                    direction, unit.strip(), now,
+                ])
+                st.cache_data.clear()
+                st.rerun()
+            else:
+                st.warning("Please enter a Key Result name.")
+
+
+# ──────────────────────────────────────────────
+#  Update Key Result dialog (modal popup)
+# ──────────────────────────────────────────────
+
+@st.dialog("Update Key Result")
+def update_kr_dialog(row: pd.Series, okr_id: str, quarter: str):
+    direction = str(row.get("direction", "increase")).lower()
+    is_decrease = direction == "decrease"
+    unit = row.get("unit", "")
+
+    st.markdown(
+        f"<h4 style='margin-bottom:4px;'>{row['name']}</h4>"
+        f"<p style='color:#64748b; font-size:0.85rem;'>"
+        f"{'Lower is better' if is_decrease else 'Higher is better'} · "
+        f"Target: {data.format_value(row['target_value'], unit)}</p>",
+        unsafe_allow_html=True,
+    )
+
+    new_value = st.number_input(
+        f"New value ({unit})",
+        value=float(row["current_value"]),
+    )
+    note_author = st.text_input("Your name")
+    note_text = st.text_area("Add a note (optional)", height=80)
+
+    st.markdown("")
+    c1, c2, c3 = st.columns([2, 1, 1])
+    with c2:
+        if st.button("Cancel", use_container_width=True, key="upd_cancel"):
+            st.rerun()
+    with c3:
+        if st.button("Save Update", type="primary", use_container_width=True, key="upd_save"):
+            now = datetime.now().strftime("%Y-%m-%d %H:%M")
+            try:
+                sheets.update_kpi_value(quarter, str(row["id"]), okr_id, new_value, now)
+                if note_text.strip() and note_author.strip():
+                    sheets.add_note("KR", str(row["id"]), note_author.strip(), note_text.strip(), now)
+                st.cache_data.clear()
+                st.rerun()
+            except Exception as exc:
+                st.error(f"Error: {exc}")
 
 
 # ──────────────────────────────────────────────
@@ -148,7 +344,7 @@ def render_sidebar(quarter_ref: list):
             "<span style='background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7); "
             "-webkit-background-clip: text; -webkit-text-fill-color: transparent; "
             "font-size: 1.5rem;'>OKR Tracker</span></h1>"
-            "<p style='text-align:center; color:#94a3b8; font-size:0.8rem; margin-top:2px;'>"
+            "<p style='text-align:center; color:#8b8fa3; font-size:0.8rem; margin-top:2px;'>"
             "Track objectives & key results</p>",
             unsafe_allow_html=True,
         )
@@ -163,12 +359,16 @@ def render_sidebar(quarter_ref: list):
 
         st.divider()
 
-        # New OKR button launches the dialog
-        if st.button("➕  New Objective", use_container_width=True, type="primary"):
+        # New OKR button — white "+" via HTML
+        if st.button(
+            "\u2795  New Objective",
+            use_container_width=True,
+            type="primary",
+        ):
             add_okr_dialog(selected)
 
         st.divider()
-        if st.button("🔄  Refresh Data", use_container_width=True):
+        if st.button("Refresh Data", use_container_width=True):
             st.cache_data.clear()
             st.rerun()
         st.caption("Auto-syncs from Google Sheets every 2 min.")
@@ -199,10 +399,11 @@ def render_okr_tabs(
 ):
     if okrs_df.empty:
         st.markdown(
-            "<div style='text-align:center; padding:80px 20px;'>"
+            "<div style='text-align:center; padding:80px 20px; background:#ffffff; "
+            "border-radius:16px; border:1px dashed #c7c4e0;'>"
             "<p style='font-size:3rem; margin-bottom:8px;'>🎯</p>"
             "<h3 style='color:#475569;'>No objectives yet</h3>"
-            "<p style='color:#94a3b8;'>Click <strong>New Objective</strong> "
+            "<p style='color:#8b8fa3;'>Click <strong>New Objective</strong> "
             "in the sidebar to get started.</p></div>",
             unsafe_allow_html=True,
         )
@@ -269,14 +470,14 @@ def _render_okr_content(
     # ── Detail pills ──
     st.markdown(
         f"<div style='display:flex; gap:10px; flex-wrap:wrap; margin:8px 0 20px 0;'>"
-        f"<span style='background:#f1f5f9; color:#475569; padding:5px 14px; "
-        f"border-radius:20px; font-size:0.82rem; border:1px solid #e2e8f0;'>"
+        f"<span style='background:#ede9fe; color:#6d28d9; padding:5px 14px; "
+        f"border-radius:20px; font-size:0.82rem; border:1px solid #ddd6fe;'>"
         f"👤 {row.get('owner', '—')}</span>"
-        f"<span style='background:#f1f5f9; color:#475569; padding:5px 14px; "
-        f"border-radius:20px; font-size:0.82rem; border:1px solid #e2e8f0;'>"
+        f"<span style='background:#e0f2fe; color:#0369a1; padding:5px 14px; "
+        f"border-radius:20px; font-size:0.82rem; border:1px solid #bae6fd;'>"
         f"📅 {row.get('target_date', '—')}</span>"
-        f"<span style='background:#f1f5f9; color:#475569; padding:5px 14px; "
-        f"border-radius:20px; font-size:0.82rem; border:1px solid #e2e8f0;'>"
+        f"<span style='background:#fce7f3; color:#be185d; padding:5px 14px; "
+        f"border-radius:20px; font-size:0.82rem; border:1px solid #fbcfe8;'>"
         f"🔄 {row.get('last_updated', '—')}</span>"
         f"</div>",
         unsafe_allow_html=True,
@@ -287,13 +488,17 @@ def _render_okr_content(
     with kr_header_col:
         st.markdown(f"#### Key Results ({len(krs)})")
     with kr_add_col:
-        _render_add_kr_form(okr_id, quarter)
+        if st.button("+ Add Key Result", key=f"add_kr_btn_{okr_id}", type="primary", use_container_width=True):
+            # Store the okr_id in session state so the dialog knows which OKR
+            st.session_state["_add_kr_okr_id"] = okr_id
+            st.session_state["_add_kr_quarter"] = quarter
+            add_kr_dialog(okr_id, quarter)
 
     if krs.empty:
         st.markdown(
-            "<div style='text-align:center; padding:40px; background:#f8fafc; "
-            "border-radius:12px; border:1px dashed #cbd5e1;'>"
-            "<p style='color:#94a3b8; margin:0;'>No Key Results yet — "
+            "<div style='text-align:center; padding:40px; background:#faf9ff; "
+            "border-radius:14px; border:2px dashed #c7c4e0;'>"
+            "<p style='color:#8b8fa3; margin:0;'>No Key Results yet — "
             "click <strong>+ Add Key Result</strong> to get started.</p></div>",
             unsafe_allow_html=True,
         )
@@ -308,7 +513,13 @@ def _render_okr_content(
             st.caption("No notes yet.")
         else:
             for _, n in okr_notes.iterrows():
-                st.markdown(f"**{n['author']}** — {n['timestamp']}  \n{n['text']}")
+                st.markdown(
+                    f"<div style='background:#faf9ff; border:1px solid #e2e0f0; border-radius:10px; "
+                    f"padding:10px 14px; margin-bottom:8px;'>"
+                    f"<strong>{n['author']}</strong> <span style='color:#94a3b8;'>— {n['timestamp']}</span>"
+                    f"<br>{n['text']}</div>",
+                    unsafe_allow_html=True,
+                )
         _render_note_form("OKR", okr_id)
 
 
@@ -336,8 +547,8 @@ def _render_kr_card(
             arrow = "↓" if is_decrease else "↑"
             st.markdown(
                 f"<span style='display:inline-block; background:{color}18; color:{color}; "
-                f"width:24px; height:24px; border-radius:6px; text-align:center; "
-                f"line-height:24px; font-size:0.85rem; margin-right:8px;'>{arrow}</span>"
+                f"width:26px; height:26px; border-radius:8px; text-align:center; "
+                f"line-height:26px; font-size:0.85rem; margin-right:8px;'>{arrow}</span>"
                 f"<strong style='font-size:1rem;'>{row['name']}</strong>",
                 unsafe_allow_html=True,
             )
@@ -355,7 +566,8 @@ def _render_kr_card(
                 unsafe_allow_html=True,
             )
         with c5:
-            _render_kr_update_form(row, okr_id, quarter)
+            if st.button("✏️ Update", key=f"upd_btn_{kr_id}", use_container_width=True):
+                update_kr_dialog(row, okr_id, quarter)
 
         # ── Progress bar ──
         clamped = max(0.0, min(achievement / 100, 1.0))
@@ -392,8 +604,8 @@ def _render_kr_card(
 
 def _render_modern_chart(trend: pd.DataFrame, row: pd.Series, is_decrease: bool):
     """Area chart with gradient fill, modern styling."""
-    line_color = "#6366f1"
-    fill_color = "rgba(99, 102, 241, 0.08)"
+    line_color = "#8b5cf6"
+    fill_color = "rgba(139, 92, 246, 0.10)"
     target_color = "#22c55e" if is_decrease else "#ef4444"
 
     fig = go.Figure()
@@ -405,8 +617,8 @@ def _render_modern_chart(trend: pd.DataFrame, row: pd.Series, is_decrease: bool)
         line=dict(color=line_color, width=2.5, shape="spline"),
         mode="lines+markers",
         marker=dict(
-            size=7, color="#ffffff",
-            line=dict(width=2, color=line_color),
+            size=8, color="#ffffff",
+            line=dict(width=2.5, color=line_color),
         ),
         name="Value",
         hovertemplate="%{x|%b %d, %Y}<br><b>%{y:.1f}</b><extra></extra>",
@@ -452,102 +664,37 @@ def _render_modern_chart(trend: pd.DataFrame, row: pd.Series, is_decrease: bool)
 
 
 # ──────────────────────────────────────────────
-#  Forms: update KR, add note, add KR
+#  Notes helpers
 # ──────────────────────────────────────────────
-
-def _render_kr_update_form(row: pd.Series, okr_id: str, quarter: str):
-    key_prefix = f"kr_update_{row['id']}"
-    with st.popover("✏️ Update"):
-        new_value = st.number_input(
-            f"New value ({row.get('unit', '')})",
-            value=float(row["current_value"]),
-            key=f"{key_prefix}_val",
-        )
-        note_author = st.text_input("Your name", key=f"{key_prefix}_author")
-        note_text = st.text_area("Add a note (optional)", key=f"{key_prefix}_note", height=80)
-        if st.button("Save", key=f"{key_prefix}_save", type="primary", use_container_width=True):
-            now = datetime.now().strftime("%Y-%m-%d %H:%M")
-            try:
-                sheets.update_kpi_value(quarter, str(row["id"]), okr_id, new_value, now)
-                if note_text.strip() and note_author.strip():
-                    sheets.add_note("KR", str(row["id"]), note_author.strip(), note_text.strip(), now)
-                st.success("Saved!")
-                st.rerun()
-            except Exception as exc:
-                st.error(f"Error: {exc}")
-
 
 def _render_notes_list(notes_df: pd.DataFrame):
     if notes_df.empty:
         st.caption("No notes yet.")
     else:
         for _, n in notes_df.iterrows():
-            st.markdown(f"**{n['author']}** — {n['timestamp']}  \n{n['text']}")
+            st.markdown(
+                f"<div style='background:#faf9ff; border:1px solid #e2e0f0; border-radius:10px; "
+                f"padding:10px 14px; margin-bottom:8px;'>"
+                f"<strong>{n['author']}</strong> <span style='color:#94a3b8;'>— {n['timestamp']}</span>"
+                f"<br>{n['text']}</div>",
+                unsafe_allow_html=True,
+            )
 
 
 def _render_note_form(parent_type: str, parent_id: str):
     key_prefix = f"note_{parent_type}_{parent_id}"
+    st.markdown(
+        "<div style='border:2px solid #d4d0e8; border-radius:12px; padding:14px; margin-top:8px; background:#ffffff;'>",
+        unsafe_allow_html=True,
+    )
     author = st.text_input("Your name", key=f"{key_prefix}_author")
     text = st.text_area("Note", key=f"{key_prefix}_text", height=60)
-    if st.button("Add note", key=f"{key_prefix}_btn"):
+    if st.button("Add note", key=f"{key_prefix}_btn", type="primary"):
         if author.strip() and text.strip():
             now = datetime.now().strftime("%Y-%m-%d %H:%M")
             sheets.add_note(parent_type, parent_id, author.strip(), text.strip(), now)
-            st.success("Note added.")
+            st.cache_data.clear()
             st.rerun()
         else:
             st.warning("Enter both name and note.")
-
-
-def _render_add_kr_form(okr_id: str, quarter: str):
-    key_prefix = f"add_kr_{okr_id}"
-    with st.popover("+ Add Key Result"):
-        name = st.text_input("Key Result name", key=f"{key_prefix}_name")
-        owner = st.text_input("Owner", key=f"{key_prefix}_owner")
-
-        direction = st.radio(
-            "Direction",
-            options=["increase", "decrease"],
-            horizontal=True,
-            key=f"{key_prefix}_dir",
-            help="Choose 'decrease' for metrics you want to reduce (e.g. cost, churn)",
-        )
-
-        if direction == "decrease":
-            baseline_value = st.number_input(
-                "Starting value (baseline)", value=0.0, key=f"{key_prefix}_base",
-                help="The value you're starting from (e.g. $600)",
-            )
-            current_value = st.number_input(
-                "Current value", value=baseline_value, key=f"{key_prefix}_cur",
-            )
-            target_value = st.number_input(
-                "Target value (lower)", value=0.0, key=f"{key_prefix}_tgt",
-                help="The value you want to reach (e.g. $500)",
-            )
-        else:
-            baseline_value = st.number_input(
-                "Starting value (baseline)", value=0.0, key=f"{key_prefix}_base",
-            )
-            current_value = st.number_input(
-                "Current value", value=0.0, key=f"{key_prefix}_cur",
-            )
-            target_value = st.number_input(
-                "Target value", value=100.0, key=f"{key_prefix}_tgt",
-            )
-
-        unit = st.text_input("Unit (e.g. %, $, users)", key=f"{key_prefix}_unit")
-
-        if st.button("Create", key=f"{key_prefix}_btn", type="primary", use_container_width=True):
-            if name.strip():
-                now = datetime.now().strftime("%Y-%m-%d %H:%M")
-                new_id = str(uuid.uuid4())[:8]
-                sheets.add_kpi(quarter, [
-                    new_id, okr_id, name.strip(), owner.strip(),
-                    current_value, target_value, baseline_value,
-                    direction, unit.strip(), now,
-                ])
-                st.success(f"Key Result '{name}' added.")
-                st.rerun()
-            else:
-                st.warning("Please enter a name.")
+    st.markdown("</div>", unsafe_allow_html=True)
