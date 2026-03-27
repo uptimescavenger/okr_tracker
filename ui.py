@@ -168,6 +168,39 @@ def inject_css():
         color: #475569 !important;
     }}
 
+    /* ── Update button — black outline, transparent bg, full round ── */
+    .update-btn button {{
+        background: transparent !important;
+        border: 1.5px solid #1e293b !important;
+        color: #1e293b !important;
+        border-radius: {BR} !important;
+        box-shadow: none !important;
+        font-weight: 600 !important;
+        transition: all 0.15s ease;
+    }}
+    .update-btn button:hover {{
+        background: #f1f5f9 !important;
+        border-color: #000000 !important;
+        color: #000000 !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }}
+
+    /* ── Edit (pencil) button — minimal, no border ── */
+    .edit-btn button {{
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 2px 6px !important;
+        min-height: 0 !important;
+        line-height: 1 !important;
+    }}
+    .edit-btn button:hover {{
+        background: #f1f5f9 !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }}
+
     /* ── Responsive: stack columns on narrow screens ── */
     @media (max-width: 768px) {{
         [data-testid="stHorizontalBlock"] {{
@@ -191,6 +224,18 @@ def inject_css():
 # ──────────────────────────────────────────────
 #  Color helper for inline progress bars
 # ──────────────────────────────────────────────
+
+def _pencil_svg(size: int = 16) -> str:
+    """Return an inline SVG pencil icon matching the reference image style."""
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" '
+        f'viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" '
+        f'stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;">'
+        f'<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>'
+        f'<path d="M15 5l4 4"/>'
+        f'</svg>'
+    )
+
 
 def _progress_bar_color(pct: float) -> str:
     """Return a CSS color based on progress percentage."""
@@ -620,18 +665,27 @@ def _render_okr_content(
     bar_color = _progress_bar_color(pct)
     krs = data.krs_for_okr(okr_id, kpis_df)
 
-    # ── Header: title + edit button + overall % ──
-    col1, col_edit, col2 = st.columns([4, 0.5, 1])
+    # ── Header: title with inline pencil + overall % ──
+    col1, col2 = st.columns([5, 1])
     with col1:
-        st.markdown(f"### {row['title']}")
+        # Title with pencil icon right next to it
+        st.markdown(
+            f"<div style='display:flex; align-items:center; gap:8px;'>"
+            f"<h3 style='margin:0;'>{row['title']}</h3>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+        # Edit button right below title, tight spacing
+        with st.container():
+            st.markdown('<div class="edit-btn">', unsafe_allow_html=True)
+            if st.button(f"Edit", key=f"edit_okr_{okr_id}", help="Edit this objective"):
+                edit_okr_dialog(row, quarter)
+            st.markdown('</div>', unsafe_allow_html=True)
         if row.get("description"):
             st.markdown(
-                f"<p style='color:#64748b; margin-top:-8px;'>{row['description']}</p>",
+                f"<p style='color:#64748b; margin-top:-4px;'>{row['description']}</p>",
                 unsafe_allow_html=True,
             )
-    with col_edit:
-        if st.button("✏️", key=f"edit_okr_{okr_id}", help="Edit this objective"):
-            edit_okr_dialog(row, quarter)
     with col2:
         st.markdown(
             f"<div style='text-align:right; padding:4px 0;'>"
@@ -724,23 +778,32 @@ def _render_kr_card(
     unit = row.get("unit", "")
 
     with st.container(border=True):
-        # ── Row 1: name + edit + update buttons ──
-        name_col, edit_col, btn_col = st.columns([5, 0.5, 1])
+        # ── Row 1: name with inline edit + update button ──
+        name_col, btn_col = st.columns([5, 1])
         with name_col:
             arrow = "↓" if is_decrease else "↑"
             st.markdown(
-                f"<span style='display:inline-block; background:{color}18; color:{color}; "
-                f"width:24px; height:24px; border-radius:10px; text-align:center; "
-                f"line-height:24px; font-size:0.85rem; margin-right:8px;'>{arrow}</span>"
-                f"<strong style='font-size:1rem;'>{row['name']}</strong>",
+                f"<div style='display:flex; align-items:center; gap:8px;'>"
+                f"<span style='display:inline-flex; align-items:center; justify-content:center; "
+                f"background:{color}18; color:{color}; "
+                f"width:24px; height:24px; border-radius:10px; "
+                f"font-size:0.85rem; flex-shrink:0;'>{arrow}</span>"
+                f"<strong style='font-size:1rem;'>{row['name']}</strong>"
+                f"</div>",
                 unsafe_allow_html=True,
             )
-        with edit_col:
-            if st.button("✏️", key=f"edit_kr_{kr_id}", help="Edit this key result"):
-                edit_kr_dialog(row, quarter)
+            # Edit button tight under name
+            with st.container():
+                st.markdown('<div class="edit-btn">', unsafe_allow_html=True)
+                if st.button("Edit", key=f"edit_kr_{kr_id}", help="Edit this key result"):
+                    edit_kr_dialog(row, quarter)
+                st.markdown('</div>', unsafe_allow_html=True)
         with btn_col:
+            # Update button with black outline styling
+            st.markdown('<div class="update-btn">', unsafe_allow_html=True)
             if st.button("Update", key=f"upd_btn_{kr_id}", use_container_width=True):
                 update_kr_dialog(row, okr_id, quarter)
+            st.markdown('</div>', unsafe_allow_html=True)
 
         # ── Row 2: metrics in a 3-col layout ──
         m1, m2, m3 = st.columns(3)
