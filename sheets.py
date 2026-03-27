@@ -239,3 +239,52 @@ def update_kpi_fields(quarter: str, kpi_id: str, fields: dict):
         col_idx = config.KPI_COLUMNS.index(col_name) + 1
         ws.update_cell(cell.row, col_idx, value)
     _clear_cache()
+
+
+# ---------- Delete ----------
+
+def delete_okr(quarter: str, okr_id: str):
+    """Delete an OKR row and all its child Key Results from the sheet."""
+    # Delete the OKR row
+    ws = _get_or_create_worksheet(
+        config.okr_tab_name(quarter), config.OKR_COLUMNS
+    )
+    cell = ws.find(str(okr_id), in_column=1)
+    if cell:
+        ws.delete_rows(cell.row)
+
+    # Delete all KRs belonging to this OKR
+    kpi_ws = _get_or_create_worksheet(
+        config.kpi_tab_name(quarter), config.KPI_COLUMNS
+    )
+    # Find all rows where okr_id column matches, delete from bottom up
+    all_values = kpi_ws.get_all_values()
+    if len(all_values) > 1:
+        okr_id_col = config.KPI_COLUMNS.index("okr_id")
+        rows_to_delete = []
+        for i, row_vals in enumerate(all_values[1:], start=2):  # skip header
+            if len(row_vals) > okr_id_col and str(row_vals[okr_id_col]) == str(okr_id):
+                rows_to_delete.append(i)
+        # Delete from bottom up so row indices stay valid
+        for row_num in reversed(rows_to_delete):
+            kpi_ws.delete_rows(row_num)
+
+    _clear_cache()
+
+
+def delete_kpi(quarter: str, kpi_id: str, okr_id: str):
+    """Delete a single Key Result row and sync the parent OKR progress."""
+    ws = _get_or_create_worksheet(
+        config.kpi_tab_name(quarter), config.KPI_COLUMNS
+    )
+    cell = ws.find(str(kpi_id), in_column=1)
+    if cell:
+        ws.delete_rows(cell.row)
+
+    # Sync parent OKR progress after deletion
+    _clear_cache()
+    from datetime import datetime
+    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    fresh_kpis = read_kpis(quarter)
+    _sync_okr_progress(quarter, okr_id, fresh_kpis, now)
+    _clear_cache()

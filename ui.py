@@ -280,6 +280,26 @@ def edit_okr_dialog(row: pd.Series, quarter: str):
             else:
                 st.warning("Please enter an objective title.")
 
+    # ── Danger zone: delete ──
+    st.divider()
+    st.markdown(
+        "<p style='color:#ef4444; font-weight:600; font-size:0.85rem;'>Danger Zone</p>",
+        unsafe_allow_html=True,
+    )
+    confirm = st.checkbox(
+        f"I understand this will permanently delete **\"{row.get('title', '')}\"** and all its Key Results.",
+        key="confirm_delete_okr",
+    )
+    if st.button(
+        "Delete Objective",
+        use_container_width=True,
+        key="delete_okr_btn",
+        disabled=not confirm,
+    ):
+        sheets.delete_okr(quarter, str(row["id"]))
+        st.cache_data.clear()
+        st.rerun()
+
 
 # ──────────────────────────────────────────────
 #  Edit Key Result dialog
@@ -351,6 +371,27 @@ def edit_kr_dialog(row: pd.Series, quarter: str):
                 st.rerun()
             else:
                 st.warning("Please enter a Key Result name.")
+
+    # ── Danger zone: delete ──
+    st.divider()
+    st.markdown(
+        "<p style='color:#ef4444; font-weight:600; font-size:0.85rem;'>Danger Zone</p>",
+        unsafe_allow_html=True,
+    )
+    confirm = st.checkbox(
+        f"I understand this will permanently delete **\"{row.get('name', '')}\"**.",
+        key="confirm_delete_kr",
+    )
+    if st.button(
+        "Delete Key Result",
+        use_container_width=True,
+        key="delete_kr_btn",
+        disabled=not confirm,
+    ):
+        okr_id = str(row.get("okr_id", ""))
+        sheets.delete_kpi(quarter, str(row["id"]), okr_id)
+        st.cache_data.clear()
+        st.rerun()
 
 
 # ──────────────────────────────────────────────
