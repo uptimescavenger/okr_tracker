@@ -50,7 +50,7 @@ notes_df = sheets.read_notes()
 
 # ── Header ──
 st.markdown(
-    f"<h2 style='margin-bottom:2px; color:#1e293b;'>📊 {quarter}</h2>"
+    f"<h2 style='margin-bottom:2px; color:#1e293b;'>{quarter}</h2>"
     f"<p style='color:#94a3b8; margin-top:0;'>Click an objective tab to view key results and progress.</p>",
     unsafe_allow_html=True,
 )
