@@ -178,23 +178,25 @@ def inject_css():
         border-radius: {BR} !important;
     }}
 
-    /* ── Pencil edit button — icon + text only, no border/bg ── */
+    /* ── Pencil edit button — icon + text only, no border/bg, 10px radius ── */
     .pencil-edit button {{
         background: transparent !important;
         border: none !important;
         color: #64748b !important;
         box-shadow: none !important;
-        padding: 2px 4px !important;
+        padding: 2px 6px !important;
         min-height: 0 !important;
         font-size: 0.8rem !important;
-        transition: color 0.15s ease;
+        border-radius: {BR} !important;
+        transition: color 0.15s ease, background 0.15s ease;
     }}
     .pencil-edit button:hover {{
-        background: transparent !important;
+        background: rgba(99, 102, 241, 0.08) !important;
         border: none !important;
         color: #6366f1 !important;
         transform: none !important;
         box-shadow: none !important;
+        border-radius: {BR} !important;
     }}
 
     /* ── Update button — black outline, transparent bg ── */
@@ -266,7 +268,7 @@ def _progress_bar_color(pct: float) -> str:
 #  Add OKR dialog (modal popup)
 # ──────────────────────────────────────────────
 
-@st.dialog("Create New Objective", width="large")
+@st.dialog("Create New Objective", width="small")
 def add_okr_dialog(quarter: str):
     st.markdown(
         "<p style='color:#64748b; margin-bottom:16px;'>Add a new objective to track for this quarter.</p>",
@@ -304,7 +306,7 @@ def add_okr_dialog(quarter: str):
 #  Edit OKR dialog
 # ──────────────────────────────────────────────
 
-@st.dialog("Edit Objective", width="large")
+@st.dialog("Edit Objective", width="small")
 def edit_okr_dialog(row: pd.Series, quarter: str):
     st.markdown(
         "<p style='color:#64748b; margin-bottom:16px;'>Update the objective details.</p>",
@@ -364,7 +366,7 @@ def edit_okr_dialog(row: pd.Series, quarter: str):
 #  Edit Key Result dialog
 # ──────────────────────────────────────────────
 
-@st.dialog("Edit Key Result", width="large")
+@st.dialog("Edit Key Result", width="small")
 def edit_kr_dialog(row: pd.Series, quarter: str):
     st.markdown(
         "<p style='color:#64748b; margin-bottom:16px;'>Update the key result details.</p>",
@@ -457,7 +459,7 @@ def edit_kr_dialog(row: pd.Series, quarter: str):
 #  Add Key Result dialog (modal popup)
 # ──────────────────────────────────────────────
 
-@st.dialog("Add Key Result", width="large")
+@st.dialog("Add Key Result", width="small")
 def add_kr_dialog(okr_id: str, quarter: str):
     st.markdown(
         "<p style='color:#64748b; margin-bottom:16px;'>Define a measurable key result for this objective.</p>",
@@ -859,15 +861,32 @@ def _render_kr_card(
 
 def _render_modern_chart(trend: pd.DataFrame, row: pd.Series, is_decrease: bool):
     line_color = "#8b5cf6"
-    fill_color = "rgba(139, 92, 246, 0.10)"
     target_color = "#22c55e" if is_decrease else "#ef4444"
+    target_val = float(row["target_value"])
+
+    # Compute Y-axis range: zoom into the data, include target line
+    all_values = list(trend["value"].dropna()) + [target_val]
+    y_min = min(all_values)
+    y_max = max(all_values)
+    # If 0 is within or near the data range, include it; otherwise zoom in
+    padding = (y_max - y_min) * 0.15 if y_max != y_min else max(abs(y_max) * 0.15, 1)
+    range_lo = y_min - padding
+    range_hi = y_max + padding
+    # Only snap to zero if data is close to zero
+    if y_min >= 0 and range_lo < 0:
+        range_lo = 0
 
     fig = go.Figure()
 
+    # Area fill from range bottom, not from zero
+    fig.add_trace(go.Scatter(
+        x=trend["date"], y=[range_lo] * len(trend),
+        line=dict(width=0), showlegend=False, hoverinfo="skip",
+    ))
     fig.add_trace(go.Scatter(
         x=trend["date"], y=trend["value"],
-        fill="tozeroy",
-        fillcolor=fill_color,
+        fill="tonexty",
+        fillcolor="rgba(139, 92, 246, 0.10)",
         line=dict(color=line_color, width=2.5, shape="spline"),
         mode="lines+markers",
         marker=dict(
@@ -879,7 +898,7 @@ def _render_modern_chart(trend: pd.DataFrame, row: pd.Series, is_decrease: bool)
     ))
 
     fig.add_hline(
-        y=float(row["target_value"]),
+        y=target_val,
         line_dash="dot",
         line_color=target_color,
         line_width=1.5,
@@ -904,6 +923,7 @@ def _render_modern_chart(trend: pd.DataFrame, row: pd.Series, is_decrease: bool)
             tickfont=dict(color="#94a3b8", size=10),
             linecolor="rgba(0,0,0,0)",
             title=dict(text=row.get("unit", ""), font=dict(color="#94a3b8", size=10)),
+            range=[range_lo, range_hi],
         ),
         showlegend=False,
         hoverlabel=dict(
