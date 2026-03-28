@@ -159,12 +159,13 @@ def inject_css():
         box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
     }}
     [data-testid="stTabs"] button[aria-selected="false"] {{
-        color: #64748b !important;
+        color: #1e293b !important;
         background: #f1f0fb !important;
+        font-weight: 600 !important;
     }}
     [data-testid="stTabs"] button[aria-selected="false"]:hover {{
         background: #e8e5f5 !important;
-        color: #4338ca !important;
+        color: #000000 !important;
     }}
 
     /* ── Containers / cards ── */
@@ -197,12 +198,25 @@ def inject_css():
         gap: 0.5rem !important;
     }}
 
-    /* ── All buttons — pill-shaped by default ── */
-    button {{
+    /*
+     * ── ALL BUTTONS — 10px rounded, pill-like ──
+     * This targets every button in the app via multiple selectors
+     * to override Streamlit's defaults with maximum specificity.
+     */
+    button,
+    .stButton > button,
+    [data-testid="stBaseButton-primary"] > button,
+    [data-testid="stBaseButton-secondary"] > button,
+    [data-testid="baseButton-primary"],
+    [data-testid="baseButton-secondary"] {{
         font-weight: 600 !important;
-        border-radius: 999px !important;
+        border-radius: {BR} !important;
     }}
-    button[kind="primary"] {{
+
+    /* Primary style (purple gradient) */
+    button[kind="primary"],
+    .stButton > button[kind="primary"],
+    [data-testid="stBaseButton-primary"] > button {{
         background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
         color: white !important;
         border: none !important;
@@ -210,46 +224,30 @@ def inject_css():
         transition: all 0.2s ease;
         padding: 6px 20px !important;
         font-size: 0.82rem !important;
+        border-radius: {BR} !important;
     }}
-    button[kind="primary"]:hover {{
+    button[kind="primary"]:hover,
+    .stButton > button[kind="primary"]:hover,
+    [data-testid="stBaseButton-primary"] > button:hover {{
         box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
         transform: translateY(-1px);
     }}
-    button[kind="secondary"] {{
+
+    /* Secondary style */
+    button[kind="secondary"],
+    .stButton > button[kind="secondary"],
+    [data-testid="stBaseButton-secondary"] > button {{
         border: 1px solid #d4d0e8 !important;
         color: #475569 !important;
+        border-radius: {BR} !important;
     }}
 
-    /* ── Tabs keep flat bottom corners ── */
-    [data-testid="stTabs"] button {{
+    /* ── Tabs — flat bottom, NOT pill-shaped ── */
+    [data-testid="stTabs"] button,
+    [data-testid="stTabs"] [role="tab"] {{
         border-radius: {BR} {BR} 0 0 !important;
         padding: 8px 16px !important;
         font-size: 0.85rem !important;
-    }}
-
-    /* ── Edit buttons — semi-transparent background ── */
-    .edit-btn button[kind="primary"] {{
-        background: linear-gradient(135deg, rgba(99,102,241,0.5), rgba(139,92,246,0.5)) !important;
-        box-shadow: 0 1px 4px rgba(99, 102, 241, 0.15);
-    }}
-    .edit-btn button[kind="primary"]:hover {{
-        background: linear-gradient(135deg, rgba(99,102,241,0.7), rgba(139,92,246,0.7)) !important;
-        box-shadow: 0 3px 12px rgba(99, 102, 241, 0.25);
-    }}
-
-    /* ── Delete button in dialogs ── */
-    .delete-btn button {{
-        background: transparent !important;
-        border: 1.5px solid #ef4444 !important;
-        color: #ef4444 !important;
-        border-radius: {BR} !important;
-        box-shadow: none !important;
-    }}
-    .delete-btn button:hover {{
-        background: #fef2f2 !important;
-    }}
-    .delete-btn button:disabled {{
-        opacity: 0.4 !important;
     }}
 
     /* ── Responsive: stack columns on narrow screens ── */
@@ -573,11 +571,9 @@ def _render_okr_content(
             unsafe_allow_html=True,
         )
 
-    # Edit button right below title — 50% transparent
-    st.markdown('<div class="edit-btn">', unsafe_allow_html=True)
+    # Edit button right below title
     if st.button("Edit Objective", key=f"edit_okr_{okr_id}", type="primary"):
         edit_okr_dialog(row, quarter)
-    st.markdown('</div>', unsafe_allow_html=True)
 
     if row.get("description"):
         st.markdown(
@@ -695,10 +691,8 @@ def _render_kr_card(
         # Edit + Update buttons side by side
         bc1, bc2 = st.columns(2)
         with bc1:
-            st.markdown('<div class="edit-btn">', unsafe_allow_html=True)
             if st.button("Edit", key=f"edit_kr_{kr_id}", type="primary", use_container_width=True):
                 edit_kr_dialog(row, quarter)
-            st.markdown('</div>', unsafe_allow_html=True)
         with bc2:
             if st.button("Update", key=f"upd_btn_{kr_id}", type="primary", use_container_width=True):
                 update_kr_dialog(row, okr_id, quarter)
