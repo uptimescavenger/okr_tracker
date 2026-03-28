@@ -258,13 +258,13 @@ def inject_css():
         transform: translateY(-1px);
     }}
 
-    /* ── Refresh / default buttons in sidebar — force black text ── */
-    section[data-testid="stSidebar"] div[data-testid="stBaseButton-minimal"] button,
-    section[data-testid="stSidebar"] div[data-testid="stBaseButton-borderless"] button,
-    section[data-testid="stSidebar"] div:not([data-testid="stBaseButton-primary"]):not([data-testid="stBaseButton-secondary"]) > button {{
+    /* ── Refresh button — black text on light purple bg ── */
+    [data-testid="stSidebar"] [data-testid="stBaseButton-minimal"] > button,
+    button[data-testid="stBaseButton-minimal"] {{
         color: #000000 !important;
         font-weight: 600 !important;
         background: rgba(99, 102, 241, 0.08) !important;
+        border: 1px solid rgba(99, 102, 241, 0.15) !important;
     }}
 
     /* ── Tabs — flat bottom, NOT pill-shaped ── */
@@ -506,7 +506,7 @@ def render_sidebar(quarter_ref: list):
             add_okr_dialog(selected)
 
         st.divider()
-        if st.button("Refresh Data", use_container_width=True):
+        if st.button("Refresh Data", use_container_width=True, key="refresh_btn"):
             st.cache_data.clear()
             st.rerun()
         st.caption("Auto-syncs from Google Sheets every 2 min.")
@@ -713,9 +713,9 @@ def _render_kr_card(
             unsafe_allow_html=True,
         )
 
-        # Edit (small, right-justified) + Update buttons
-        bc1, bc2, bc3 = st.columns([3, 1, 1.5])
-        with bc2:
+        # Edit left-justified, Update right-justified
+        bc1, bc2, bc3 = st.columns([1, 3, 1.5])
+        with bc1:
             if st.button("✎ Edit", key=f"edit_kr_{kr_id}", type="secondary"):
                 edit_kr_dialog(row, quarter)
         with bc3:
