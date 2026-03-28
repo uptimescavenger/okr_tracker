@@ -218,45 +218,7 @@ def inject_css():
         color: #475569 !important;
     }}
 
-    /* ── Edit button — minimal, icon-forward ── */
-    .edit-btn button {{
-        background: transparent !important;
-        border: none !important;
-        color: #94a3b8 !important;
-        box-shadow: none !important;
-        padding: 4px 8px !important;
-        min-height: 0 !important;
-        font-size: 0.78rem !important;
-        font-weight: 500 !important;
-        border-radius: {BR} !important;
-        transition: color 0.15s ease, background 0.15s ease;
-        letter-spacing: 0.02em;
-    }}
-    .edit-btn button:hover {{
-        background: rgba(99, 102, 241, 0.06) !important;
-        color: #6366f1 !important;
-        border: none !important;
-        transform: none !important;
-        box-shadow: none !important;
-    }}
-
-    /* ── Update button — black outline ── */
-    .kr-update-btn button {{
-        background: transparent !important;
-        border: 1.5px solid #1e293b !important;
-        color: #1e293b !important;
-        border-radius: {BR} !important;
-        box-shadow: none !important;
-        font-weight: 600 !important;
-        transition: all 0.15s ease;
-    }}
-    .kr-update-btn button:hover {{
-        background: #f1f5f9 !important;
-        border-color: #000000 !important;
-        color: #000000 !important;
-        transform: none !important;
-        box-shadow: none !important;
-    }}
+    /* edit-btn and kr-update-btn use primary style — no overrides needed */
 
     /* ── Delete button in dialogs ── */
     .delete-btn button {{
@@ -595,10 +557,8 @@ def _render_okr_content(
         )
 
     # Edit button right below title
-    st.markdown('<div class="edit-btn">', unsafe_allow_html=True)
-    if st.button(f"Edit objective", key=f"edit_okr_{okr_id}"):
+    if st.button("Edit Objective", key=f"edit_okr_{okr_id}", type="primary"):
         edit_okr_dialog(row, quarter)
-    st.markdown('</div>', unsafe_allow_html=True)
 
     if row.get("description"):
         st.markdown(
@@ -716,15 +676,11 @@ def _render_kr_card(
         # Edit + Update buttons side by side
         bc1, bc2 = st.columns(2)
         with bc1:
-            st.markdown('<div class="edit-btn">', unsafe_allow_html=True)
-            if st.button("Edit", key=f"edit_kr_{kr_id}"):
+            if st.button("Edit", key=f"edit_kr_{kr_id}", type="primary", use_container_width=True):
                 edit_kr_dialog(row, quarter)
-            st.markdown('</div>', unsafe_allow_html=True)
         with bc2:
-            st.markdown('<div class="kr-update-btn">', unsafe_allow_html=True)
-            if st.button("Update", key=f"upd_btn_{kr_id}", use_container_width=True):
+            if st.button("Update", key=f"upd_btn_{kr_id}", type="primary", use_container_width=True):
                 update_kr_dialog(row, okr_id, quarter)
-            st.markdown('</div>', unsafe_allow_html=True)
 
         # Metrics row
         m1, m2 = st.columns(2)
