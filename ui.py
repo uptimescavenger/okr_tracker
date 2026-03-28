@@ -10,12 +10,18 @@ from datetime import datetime
 import pandas as pd
 import uuid
 
+import re
 import config
 import sheets
 import data
 
 # Consistent border radius used everywhere
 BR = "10px"
+
+
+def _strip_seconds(ts: str) -> str:
+    """Remove trailing :SS from a timestamp like '2026-03-28 00:01:00'."""
+    return re.sub(r"(\d{2}:\d{2}):\d{2}$", r"\1", str(ts))
 
 
 # ──────────────────────────────────────────────
@@ -692,7 +698,7 @@ def _render_okr_content(
         f"{cal_icon} {row.get('target_date', '—')}</span>"
         f"<span style='background:#fce7f3; color:#be185d; padding:4px 12px; "
         f"border-radius:10px; font-size:0.8rem; border:1px solid #fbcfe8; display:inline-flex; align-items:center; gap:4px;'>"
-        f"{clock_icon} {row.get('last_updated', '—')}</span>"
+        f"{clock_icon} {_strip_seconds(row.get('last_updated', '—'))}</span>"
         f"</div>",
         unsafe_allow_html=True,
     )
@@ -735,7 +741,7 @@ def _render_okr_content(
                 st.markdown(
                     f"<div style='background:#faf9ff; border:1px solid #e2e0f0; border-radius:10px; "
                     f"padding:10px 14px; margin-bottom:8px;'>"
-                    f"<strong>{n['author']}</strong> <span style='color:#94a3b8;'> {n['timestamp']}</span>"
+                    f"<strong>{n['author']}</strong> <span style='color:#94a3b8;'> {_strip_seconds(n['timestamp'])}</span>"
                     f"<br>{n['text']}</div>",
                     unsafe_allow_html=True,
                 )
@@ -807,7 +813,7 @@ def _render_kr_card(
         parts = f"{user_icon} {row.get('owner', '—')}"
         if is_decrease:
             parts += f" &middot; Baseline: {data.format_value(row.get('baseline_value', '—'), unit)}"
-        parts += f" &middot; {clock_icon} {row.get('last_updated', '—')}"
+        parts += f" &middot; {clock_icon} {_strip_seconds(row.get('last_updated', '—'))}"
         st.markdown(
             f"<p style='color:#94a3b8; font-size:0.75rem; margin:4px 0 0 0; display:flex; align-items:center; gap:4px; flex-wrap:wrap;'>"
             f"{parts}</p>",
@@ -892,7 +898,7 @@ def _render_notes_list(notes_df: pd.DataFrame):
             st.markdown(
                 f"<div style='background:#faf9ff; border:1px solid #e2e0f0; border-radius:10px; "
                 f"padding:10px 14px; margin-bottom:8px;'>"
-                f"<strong>{n['author']}</strong> <span style='color:#94a3b8;'> {n['timestamp']}</span>"
+                f"<strong>{n['author']}</strong> <span style='color:#94a3b8;'> {_strip_seconds(n['timestamp'])}</span>"
                 f"<br>{n['text']}</div>",
                 unsafe_allow_html=True,
             )
