@@ -197,10 +197,10 @@ def inject_css():
         gap: 0.5rem !important;
     }}
 
-    /* ── All buttons ── */
+    /* ── All buttons — pill-shaped by default ── */
     button {{
         font-weight: 600 !important;
-        border-radius: {BR} !important;
+        border-radius: 999px !important;
     }}
     button[kind="primary"] {{
         background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
@@ -208,6 +208,8 @@ def inject_css():
         border: none !important;
         box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
         transition: all 0.2s ease;
+        padding: 6px 20px !important;
+        font-size: 0.82rem !important;
     }}
     button[kind="primary"]:hover {{
         box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
@@ -218,13 +220,21 @@ def inject_css():
         color: #475569 !important;
     }}
 
-    /* ── Inline action buttons — pill-shaped, smaller ── */
-    .action-btn button {{
-        border-radius: 999px !important;
-        padding: 4px 16px !important;
-        font-size: 0.78rem !important;
-        min-height: 0 !important;
-        line-height: 1.4 !important;
+    /* ── Tabs keep flat bottom corners ── */
+    [data-testid="stTabs"] button {{
+        border-radius: {BR} {BR} 0 0 !important;
+        padding: 8px 16px !important;
+        font-size: 0.85rem !important;
+    }}
+
+    /* ── Edit buttons — semi-transparent background ── */
+    .edit-btn button[kind="primary"] {{
+        background: linear-gradient(135deg, rgba(99,102,241,0.5), rgba(139,92,246,0.5)) !important;
+        box-shadow: 0 1px 4px rgba(99, 102, 241, 0.15);
+    }}
+    .edit-btn button[kind="primary"]:hover {{
+        background: linear-gradient(135deg, rgba(99,102,241,0.7), rgba(139,92,246,0.7)) !important;
+        box-shadow: 0 3px 12px rgba(99, 102, 241, 0.25);
     }}
 
     /* ── Delete button in dialogs ── */
@@ -563,8 +573,8 @@ def _render_okr_content(
             unsafe_allow_html=True,
         )
 
-    # Edit button right below title
-    st.markdown('<div class="action-btn">', unsafe_allow_html=True)
+    # Edit button right below title — 50% transparent
+    st.markdown('<div class="edit-btn">', unsafe_allow_html=True)
     if st.button("Edit Objective", key=f"edit_okr_{okr_id}", type="primary"):
         edit_okr_dialog(row, quarter)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -609,10 +619,8 @@ def _render_okr_content(
     with kr_header_col:
         st.markdown(f"#### Key Results ({len(krs)})")
     with kr_add_col:
-        st.markdown('<div class="action-btn">', unsafe_allow_html=True)
         if st.button("Create Key Result", key=f"add_kr_btn_{okr_id}", type="primary", use_container_width=True):
             add_kr_dialog(okr_id, quarter)
-        st.markdown('</div>', unsafe_allow_html=True)
 
     if krs.empty:
         st.markdown(
@@ -687,15 +695,13 @@ def _render_kr_card(
         # Edit + Update buttons side by side
         bc1, bc2 = st.columns(2)
         with bc1:
-            st.markdown('<div class="action-btn">', unsafe_allow_html=True)
+            st.markdown('<div class="edit-btn">', unsafe_allow_html=True)
             if st.button("Edit", key=f"edit_kr_{kr_id}", type="primary", use_container_width=True):
                 edit_kr_dialog(row, quarter)
             st.markdown('</div>', unsafe_allow_html=True)
         with bc2:
-            st.markdown('<div class="action-btn">', unsafe_allow_html=True)
             if st.button("Update", key=f"upd_btn_{kr_id}", type="primary", use_container_width=True):
                 update_kr_dialog(row, okr_id, quarter)
-            st.markdown('</div>', unsafe_allow_html=True)
 
         # Metrics row
         m1, m2 = st.columns(2)
