@@ -218,7 +218,14 @@ def inject_css():
         color: #475569 !important;
     }}
 
-    /* edit-btn and kr-update-btn use primary style — no overrides needed */
+    /* ── Inline action buttons — pill-shaped, smaller ── */
+    .action-btn button {{
+        border-radius: 999px !important;
+        padding: 4px 16px !important;
+        font-size: 0.78rem !important;
+        min-height: 0 !important;
+        line-height: 1.4 !important;
+    }}
 
     /* ── Delete button in dialogs ── */
     .delete-btn button {{
@@ -557,8 +564,10 @@ def _render_okr_content(
         )
 
     # Edit button right below title
+    st.markdown('<div class="action-btn">', unsafe_allow_html=True)
     if st.button("Edit Objective", key=f"edit_okr_{okr_id}", type="primary"):
         edit_okr_dialog(row, quarter)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if row.get("description"):
         st.markdown(
@@ -600,8 +609,10 @@ def _render_okr_content(
     with kr_header_col:
         st.markdown(f"#### Key Results ({len(krs)})")
     with kr_add_col:
+        st.markdown('<div class="action-btn">', unsafe_allow_html=True)
         if st.button("Create Key Result", key=f"add_kr_btn_{okr_id}", type="primary", use_container_width=True):
             add_kr_dialog(okr_id, quarter)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     if krs.empty:
         st.markdown(
@@ -676,11 +687,15 @@ def _render_kr_card(
         # Edit + Update buttons side by side
         bc1, bc2 = st.columns(2)
         with bc1:
+            st.markdown('<div class="action-btn">', unsafe_allow_html=True)
             if st.button("Edit", key=f"edit_kr_{kr_id}", type="primary", use_container_width=True):
                 edit_kr_dialog(row, quarter)
+            st.markdown('</div>', unsafe_allow_html=True)
         with bc2:
+            st.markdown('<div class="action-btn">', unsafe_allow_html=True)
             if st.button("Update", key=f"upd_btn_{kr_id}", type="primary", use_container_width=True):
                 update_kr_dialog(row, okr_id, quarter)
+            st.markdown('</div>', unsafe_allow_html=True)
 
         # Metrics row
         m1, m2 = st.columns(2)
