@@ -42,11 +42,19 @@ quarter_ref = []
 ui.render_sidebar(quarter_ref)
 quarter = quarter_ref[0]
 
-# ── Load data ──
+# ── Load data with fun animation ──
+loading_placeholder = st.empty()
+loading_placeholder.empty()
+with loading_placeholder.container():
+    ui.render_loading_animation()
+
 okrs_df = sheets.read_okrs(quarter)
 kpis_df = sheets.read_kpis(quarter)
 history_df = sheets.read_kpi_history(quarter)
 notes_df = sheets.read_notes()
+
+# Clear the loading animation once data is ready
+loading_placeholder.empty()
 
 # ── Header ──
 st.markdown(

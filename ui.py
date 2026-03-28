@@ -288,7 +288,74 @@ def inject_css():
             font-size: 1.3rem !important;
         }}
     }}
+
+    /* ── Fun loading animation — bouncing target rings ── */
+    @keyframes bounce {{
+        0%, 80%, 100% {{ transform: scale(0); opacity: 0.3; }}
+        40% {{ transform: scale(1); opacity: 1; }}
+    }}
+    @keyframes pulse-ring {{
+        0% {{ transform: scale(0.8); opacity: 1; }}
+        50% {{ transform: scale(1.2); opacity: 0.5; }}
+        100% {{ transform: scale(0.8); opacity: 1; }}
+    }}
+    @keyframes shimmer {{
+        0% {{ background-position: -200% 0; }}
+        100% {{ background-position: 200% 0; }}
+    }}
+
+    /* Override Streamlit's default spinner */
+    [data-testid="stSpinner"] {{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }}
+    [data-testid="stSpinner"] > div {{
+        display: none !important;
+    }}
+    [data-testid="stSpinner"]::after {{
+        content: "";
+        display: flex;
+        gap: 8px;
+    }}
+
+    /* Skeleton shimmer for loading cards */
+    .skeleton-shimmer {{
+        background: linear-gradient(90deg, #f0eeff 25%, #e0dcf5 50%, #f0eeff 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: {BR};
+    }}
     </style>
+    """, unsafe_allow_html=True)
+
+
+def render_loading_animation():
+    """Show a fun animated loading screen while data is being fetched."""
+    st.markdown("""
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;
+                padding:60px 20px; min-height:300px;">
+        <div style="display:flex; gap:12px; margin-bottom:24px;">
+            <div style="width:18px; height:18px; border-radius:50%; background:#6366f1;
+                        animation: bounce 1.4s infinite ease-in-out both; animation-delay: -0.32s;"></div>
+            <div style="width:18px; height:18px; border-radius:50%; background:#8b5cf6;
+                        animation: bounce 1.4s infinite ease-in-out both; animation-delay: -0.16s;"></div>
+            <div style="width:18px; height:18px; border-radius:50%; background:#a855f7;
+                        animation: bounce 1.4s infinite ease-in-out both;"></div>
+            <div style="width:18px; height:18px; border-radius:50%; background:#c084fc;
+                        animation: bounce 1.4s infinite ease-in-out both; animation-delay: 0.16s;"></div>
+        </div>
+        <div style="position:relative; width:60px; height:60px; margin-bottom:20px;">
+            <div style="position:absolute; inset:0; border:3px solid #6366f1; border-radius:50%;
+                        animation: pulse-ring 1.5s infinite ease-in-out;"></div>
+            <div style="position:absolute; inset:12px; border:3px solid #8b5cf6; border-radius:50%;
+                        animation: pulse-ring 1.5s infinite ease-in-out 0.3s;"></div>
+            <div style="position:absolute; inset:24px; background:#6366f1; border-radius:50%;
+                        animation: pulse-ring 1.5s infinite ease-in-out 0.6s;"></div>
+        </div>
+        <p style="color:#6366f1; font-weight:600; font-size:1rem; margin:0;">Loading your OKRs...</p>
+        <p style="color:#94a3b8; font-size:0.8rem; margin-top:4px;">Syncing with Google Sheets</p>
+    </div>
     """, unsafe_allow_html=True)
 
 
