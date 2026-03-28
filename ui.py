@@ -242,7 +242,7 @@ def inject_css():
         border: none !important;
         border-radius: {BR} !important;
         box-shadow: 0 1px 3px rgba(99, 102, 241, 0.12);
-        padding: 1px 6px !important;
+        padding: 3px 11px !important;
         font-size: 0.55rem !important;
         transition: all 0.2s ease;
         min-height: 0 !important;
@@ -258,12 +258,13 @@ def inject_css():
         transform: translateY(-1px);
     }}
 
-    /* ── Refresh / default buttons in sidebar — black text ── */
-    [data-testid="stSidebar"] [data-testid="stBaseButton-secondary"] > button,
-    [data-testid="stSidebar"] [data-testid="stBaseButton-minimal"] > button,
-    [data-testid="stSidebar"] button:not([kind="primary"]):not([kind="secondary"]) {{
+    /* ── Refresh / default buttons in sidebar — force black text ── */
+    section[data-testid="stSidebar"] div[data-testid="stBaseButton-minimal"] button,
+    section[data-testid="stSidebar"] div[data-testid="stBaseButton-borderless"] button,
+    section[data-testid="stSidebar"] div:not([data-testid="stBaseButton-primary"]):not([data-testid="stBaseButton-secondary"]) > button {{
         color: #000000 !important;
         font-weight: 600 !important;
+        background: rgba(99, 102, 241, 0.08) !important;
     }}
 
     /* ── Tabs — flat bottom, NOT pill-shaped ── */
@@ -712,12 +713,12 @@ def _render_kr_card(
             unsafe_allow_html=True,
         )
 
-        # Edit (small, left) + Update buttons
-        bc1, bc2, bc3 = st.columns([1, 1.5, 3])
-        with bc1:
+        # Edit (small, right-justified) + Update buttons
+        bc1, bc2, bc3 = st.columns([3, 1, 1.5])
+        with bc2:
             if st.button("✎ Edit", key=f"edit_kr_{kr_id}", type="secondary"):
                 edit_kr_dialog(row, quarter)
-        with bc2:
+        with bc3:
             if st.button("Update", key=f"upd_btn_{kr_id}", type="primary"):
                 update_kr_dialog(row, okr_id, quarter)
 
