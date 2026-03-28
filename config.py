@@ -25,13 +25,18 @@ def current_quarter() -> str:
 
 
 def quarter_list(start_year: int = 2024) -> list[str]:
-    """Generate quarter labels from start_year through the current quarter."""
+    """Generate quarter labels from start_year through one quarter ahead."""
     today = date.today()
     current_y, current_q = today.year, (today.month - 1) // 3 + 1
+    # Include one future quarter for planning ahead
+    if current_q < 4:
+        next_y, next_q = current_y, current_q + 1
+    else:
+        next_y, next_q = current_y + 1, 1
     quarters = []
-    for y in range(start_year, current_y + 1):
+    for y in range(start_year, next_y + 1):
         for q in range(1, 5):
-            if y == current_y and q > current_q:
+            if y == next_y and q > next_q:
                 break
             quarters.append(f"{y}-Q{q}")
     return quarters
