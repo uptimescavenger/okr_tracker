@@ -233,15 +233,15 @@ def inject_css():
         transform: translateY(-1px);
     }}
 
-    /* Secondary style — small 50% transparent purple (used for Edit buttons) */
+    /* Secondary style — transparent with black text (Edit & Refresh buttons) */
     button[kind="secondary"],
     .stButton > button[kind="secondary"],
     [data-testid="stBaseButton-secondary"] > button {{
-        background: rgba(99, 102, 241, 0.45) !important;
-        color: white !important;
-        border: none !important;
+        background: transparent !important;
+        color: #000000 !important;
+        border: 1px solid #d1d5db !important;
         border-radius: {BR} !important;
-        box-shadow: 0 1px 3px rgba(99, 102, 241, 0.12);
+        box-shadow: none;
         padding: 3px 11px !important;
         font-size: 0.55rem !important;
         transition: all 0.2s ease;
@@ -252,9 +252,9 @@ def inject_css():
     button[kind="secondary"]:hover,
     .stButton > button[kind="secondary"]:hover,
     [data-testid="stBaseButton-secondary"] > button:hover {{
-        background: rgba(99, 102, 241, 0.65) !important;
-        color: white !important;
-        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+        background: rgba(0, 0, 0, 0.05) !important;
+        color: #000000 !important;
+        box-shadow: none;
         transform: translateY(-1px);
     }}
 
@@ -364,7 +364,10 @@ def render_loading_animation():
 # ──────────────────────────────────────────────
 
 @st.dialog("Create New Objective", width="small")
-def add_okr_dialog(quarter: str):
+def add_okr_dialog(default_quarter: str):
+    quarters = config.quarter_list()
+    default_idx = quarters.index(default_quarter) if default_quarter in quarters else len(quarters) - 1
+    selected_quarter = st.selectbox("Quarter", options=quarters, index=default_idx)
     title = st.text_input("Objective title")
     owner = st.text_input("Owner")
     target_date = st.date_input("Target date")
@@ -378,7 +381,7 @@ def add_okr_dialog(quarter: str):
             if title.strip():
                 now = datetime.now().strftime("%Y-%m-%d %H:%M")
                 new_id = str(uuid.uuid4())[:8]
-                sheets.add_okr(quarter, [
+                sheets.add_okr(selected_quarter, [
                     new_id, title.strip(), description.strip(),
                     owner.strip(), str(target_date), 0, now,
                 ])
@@ -549,7 +552,7 @@ def update_kr_dialog(row: pd.Series, okr_id: str, quarter: str):
 #  Sidebar
 # ──────────────────────────────────────────────
 
-def render_sidebar(quarter_ref: list):
+def render_sidebar(quarter: str):
     with st.sidebar:
         st.markdown(
             "<h1 style='text-align:center; margin-bottom:0;'>"
@@ -561,19 +564,11 @@ def render_sidebar(quarter_ref: list):
             unsafe_allow_html=True,
         )
         st.divider()
-
-        quarters = config.quarter_list()
-        current_q = config.current_quarter()
-        default_idx = quarters.index(current_q) if current_q in quarters else len(quarters) - 1
-        selected = st.selectbox("Quarter", options=quarters, index=default_idx)
-        quarter_ref.append(selected)
-
-        st.divider()
         if st.button("Create New Objective", use_container_width=True, type="primary"):
-            add_okr_dialog(selected)
+            add_okr_dialog(quarter)
 
         st.divider()
-        if st.button("Refresh Data", use_container_width=True, key="refresh_btn"):
+        if st.button("Refresh Data", use_container_width=True, key="refresh_btn", type="secondary"):
             st.cache_data.clear()
             st.rerun()
         st.caption("Auto-syncs from Google Sheets every 2 min.")
@@ -732,6 +727,7 @@ def _render_okr_content(
     okr_notes = data.notes_for(notes_df, "OKR", okr_id)
     notes_icon = _icon("file-text", 14, "#64748b")
     with st.expander(f"Objective Notes ({len(okr_notes)})"):
+        _render_note_form("OKR", okr_id)
         if okr_notes.empty:
             st.caption("No notes yet.")
         else:
@@ -743,7 +739,6 @@ def _render_okr_content(
                     f"<br>{n['text']}</div>",
                     unsafe_allow_html=True,
                 )
-        _render_note_form("OKR", okr_id)
 
 
 # ──────────────────────────────────────────────
@@ -827,8 +822,8 @@ def _render_kr_card(
         # Notes
         kr_notes = data.notes_for(notes_df, "KR", kr_id)
         with st.expander(f"Notes ({len(kr_notes)})", expanded=False):
-            _render_notes_list(kr_notes)
             _render_note_form("KR", kr_id)
+            _render_notes_list(kr_notes)
 
 
 # ──────────────────────────────────────────────

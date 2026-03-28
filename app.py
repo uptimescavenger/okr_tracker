@@ -37,10 +37,14 @@ if "gcp_service_account" not in st.secrets:
     )
     st.stop()
 
+# ── Quarter selector on main page ──
+quarters = config.quarter_list()
+current_q = config.current_quarter()
+default_idx = quarters.index(current_q) if current_q in quarters else len(quarters) - 1
+quarter = st.selectbox("Quarter", options=quarters, index=default_idx)
+
 # ── Sidebar ──
-quarter_ref = []
-ui.render_sidebar(quarter_ref)
-quarter = quarter_ref[0]
+ui.render_sidebar(quarter)
 
 # ── Load data with fun animation ──
 _loading = st.empty()
@@ -80,8 +84,7 @@ _loading.empty()
 
 # ── Header ──
 st.markdown(
-    f"<h2 style='margin-bottom:2px; color:#1e293b;'>{quarter}</h2>"
-    f"<p style='color:#94a3b8; margin-top:0;'>Click an objective tab to view key results and progress.</p>",
+    "<p style='color:#94a3b8; margin-top:0;'>Click an objective tab to view key results and progress.</p>",
     unsafe_allow_html=True,
 )
 
