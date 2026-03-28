@@ -233,7 +233,7 @@ def inject_css():
         transform: translateY(-1px);
     }}
 
-    /* Secondary style — 50% transparent purple (used for Edit buttons) */
+    /* Secondary style — small 50% transparent purple (used for Edit buttons) */
     button[kind="secondary"],
     .stButton > button[kind="secondary"],
     [data-testid="stBaseButton-secondary"] > button {{
@@ -241,18 +241,26 @@ def inject_css():
         color: white !important;
         border: none !important;
         border-radius: {BR} !important;
-        box-shadow: 0 1px 4px rgba(99, 102, 241, 0.15);
-        padding: 6px 20px !important;
-        font-size: 0.82rem !important;
+        box-shadow: 0 1px 3px rgba(99, 102, 241, 0.12);
+        padding: 1px 6px !important;
+        font-size: 0.55rem !important;
         transition: all 0.2s ease;
+        min-height: 0 !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0.02em;
     }}
     button[kind="secondary"]:hover,
     .stButton > button[kind="secondary"]:hover,
     [data-testid="stBaseButton-secondary"] > button:hover {{
         background: rgba(99, 102, 241, 0.65) !important;
         color: white !important;
-        box-shadow: 0 3px 12px rgba(99, 102, 241, 0.25);
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
         transform: translateY(-1px);
+    }}
+
+    /* ── Refresh / default buttons in sidebar — black text ── */
+    [data-testid="stSidebar"] button:not([kind="primary"]):not([kind="secondary"]) {{
+        color: #1e293b !important;
     }}
 
     /* ── Tabs — flat bottom, NOT pill-shaped ── */
@@ -585,7 +593,7 @@ def _render_okr_content(
         )
 
     # Edit button right below title
-    if st.button("Edit Objective", key=f"edit_okr_{okr_id}", type="secondary"):
+    if st.button("✎ Edit Objective", key=f"edit_okr_{okr_id}", type="secondary"):
         edit_okr_dialog(row, quarter)
 
     if row.get("description"):
@@ -704,7 +712,7 @@ def _render_kr_card(
         # Edit + Update buttons side by side
         bc1, bc2 = st.columns(2)
         with bc1:
-            if st.button("Edit", key=f"edit_kr_{kr_id}", type="secondary", use_container_width=True):
+            if st.button("✎ Edit", key=f"edit_kr_{kr_id}", type="secondary", use_container_width=True):
                 edit_kr_dialog(row, quarter)
         with bc2:
             if st.button("Update", key=f"upd_btn_{kr_id}", type="primary", use_container_width=True):
