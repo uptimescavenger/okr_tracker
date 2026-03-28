@@ -76,5 +76,5 @@ NOTES_COLUMNS = [
 
 # ---------- UI ----------
 PAGE_TITLE = "OKR Tracker"
-PAGE_ICON = "◎"
+PAGE_ICON = "assets/favicon.png"
 CACHE_TTL_SECONDS = 120  # how long to cache sheet reads

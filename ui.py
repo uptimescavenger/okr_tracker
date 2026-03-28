@@ -560,6 +560,7 @@ def update_kr_dialog(row: pd.Series, okr_id: str, quarter: str):
 
 def render_sidebar(quarter: str):
     with st.sidebar:
+        st.image("assets/logo.png", use_container_width=True)
         st.markdown(
             "<h1 style='text-align:center; margin-bottom:0;'>"
             "<span style='background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7); "

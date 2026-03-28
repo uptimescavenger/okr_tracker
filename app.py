@@ -6,15 +6,17 @@ Run locally:
 """
 
 import streamlit as st
+from PIL import Image
 import config
 import sheets
 import data
 import ui
 
 # ── Page config ──
+_favicon = Image.open("assets/favicon.png")
 st.set_page_config(
     page_title=config.PAGE_TITLE,
-    page_icon=config.PAGE_ICON,
+    page_icon=_favicon,
     layout="wide",
 )
 
