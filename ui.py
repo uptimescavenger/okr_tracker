@@ -11,6 +11,8 @@ import pandas as pd
 import uuid
 
 import re
+import base64
+from pathlib import Path
 import config
 import sheets
 import data
@@ -558,9 +560,22 @@ def update_kr_dialog(row: pd.Series, okr_id: str, quarter: str):
 #  Sidebar
 # ──────────────────────────────────────────────
 
+def _logo_b64() -> str:
+    """Return the logo as a base64-encoded data URI (cached in session)."""
+    if "_logo_b64" not in st.session_state:
+        raw = Path(__file__).parent.joinpath("assets", "logo.png").read_bytes()
+        st.session_state["_logo_b64"] = base64.b64encode(raw).decode()
+    return st.session_state["_logo_b64"]
+
+
 def render_sidebar(quarter: str):
     with st.sidebar:
-        st.image("assets/logo.png", use_container_width=True)
+        st.markdown(
+            f"<div style='text-align:center; margin-bottom:8px;'>"
+            f"<img src='data:image/png;base64,{_logo_b64()}' style='width:100%; max-width:240px;' />"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
         st.markdown(
             "<h1 style='text-align:center; margin-bottom:0;'>"
             "<span style='background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7); "

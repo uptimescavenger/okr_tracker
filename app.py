@@ -13,7 +13,8 @@ import data
 import ui
 
 # ── Page config ──
-_favicon = Image.open("assets/favicon.png")
+from pathlib import Path
+_favicon = Image.open(Path(__file__).parent / "assets" / "favicon.png")
 st.set_page_config(
     page_title=config.PAGE_TITLE,
     page_icon=_favicon,
